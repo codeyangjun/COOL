@@ -3,4 +3,4 @@ COOL
 
 COOL is a Classroom Object-Oriented Language developed by Standford.
 
-In this repo I wrote a compiler for COOL. (A combination of the 4 PAs in the compiler course)
+In this repo, I wrote a compiler for COOL from scratch with reference to 4 PAs I did in the online Standford compiler course.
