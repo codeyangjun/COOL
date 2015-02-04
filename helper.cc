@@ -3,8 +3,66 @@
 #include <iostream>
 #include <sstream>
 #include <cctype>
+#include <unistd.h>
 using namespace std;
+
+extern int yy_flex_debug;     // flex : prints recognized rules
+
 namespace cool_helper {
+int g_log_cerr = 0;
+
+void Init(int* argc, char *argv[]) {
+  const std::string help_msg = R"(
+  usage:
+    [-hlg] input-files
+
+  options:
+    -h    print this messages
+    -l    set yy_flex_debug = 1, prints recognized rules
+    -g    set g_log_cerr = 1
+)";
+
+  auto print_help_msg = [&]() {
+    cout << help_msg << endl;
+    exit(0);
+  };
+
+  yy_flex_debug = 0;
+  g_log_cerr = 0;
+  
+  char c;
+  while ((c = getopt(*argc, argv, "hlg")) != -1) {
+    switch (c) {
+      case 'h':
+        print_help_msg();
+
+      case 'l':
+        yy_flex_debug = 1;
+        break;
+
+      case 'g':
+        g_log_cerr = 1;
+        break;
+
+      default:
+        print_help_msg();
+    }
+  }
+
+  int idx = 1;
+  for (int i = 1; i < *argc; ++i) {
+    if (argv[i][0] == '-') continue;
+    argv[idx++]  = argv[i];
+  }
+  
+  *argc = idx;
+
+  if (*argc < 2) {
+    print_help_msg();
+    exit(1);
+  }
+}
+
 std::string TokenToString(int tok) {
   switch (tok) {
   case 0:            return("EOF");        break;
@@ -82,7 +140,7 @@ DumpCoolToken(std::ostream& out, int lineno, int token, YYSTYPE yylval) {
       } else {
         out << " \""
             << ToEscapedString(yylval.error_msg)
-            << " \"" << endl;
+            << "\"" << endl;
       }
       break;
       
@@ -113,5 +171,6 @@ std::string ToEscapedString(const std::string& str) {
   }
   return oss.str();
 }
+
 
 } // namespace cool_helper
