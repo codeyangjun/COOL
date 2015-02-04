@@ -24,11 +24,14 @@ class SymbolTable {
   ~SymbolTable();
   SymbolP AddString(const std::string& str);
   SymbolP Lookup(const std::string& str);
-  Table::iterator begin() { return table_.begin(); }
-  Table::iterator end() { return table_.end(); }
+  Table::const_iterator begin() { return table_.begin(); }
+  Table::const_iterator end() { return table_.end(); }
  private:
   Table table_;
   int idx_cnt_;
 };
 
+extern SymbolTable IdTable;
+extern SymbolTable IntTable;
+extern SymbolTable StrTable;
 #endif
