@@ -32,16 +32,16 @@ typedef class Expression* ExpressionP;
 typedef class Case* CaseP;
 typedef class Assign* AssingP;
 
-typedef std::vector<ClassP> Classes;
-typedef std::vector<FeatureP> Features;
-typedef std::vector<FormalP> Formals;
-typedef std::vector<ExpressionP> Expressions;
-typedef std::vector<CaseP> Cases;
+typedef std::vector<ClassP>* ClassesP;
+typedef std::vector<FeatureP>* FeaturesP;
+typedef std::vector<FormalP>* FormalsP;
+typedef std::vector<ExpressionP>* ExpressionsP;
+typedef std::vector<CaseP>* CasesP;
 
 class Program : public TreeNode {
  public:
-  Classes classes;
-  Program(Classes& cl) : classes(cl) {}
+  ClassesP classes;
+  Program(ClassesP cl) : classes(cl) {}
   void Dump(std::ostream& stream, int n);
 };
 
@@ -50,10 +50,10 @@ class Class : public TreeNode {
   SymbolP name;
   SymbolP parent;
   SymbolP filename;
-  Features features;
+  FeaturesP features;
   
   Class(SymbolP v_name, SymbolP v_parent, SymbolP v_filename,
-        Features& v_features)
+        FeaturesP v_features)
     : name(v_name), parent(v_parent),
       filename(v_filename), features(v_features) {}
 
@@ -68,13 +68,13 @@ class Method : public Feature {
  public:
    SymbolP name;
    SymbolP return_type;
-   Formals formals;
-   Expressions expressions;
+   FormalsP formals;
+   ExpressionsP expressions;
 
    Method(SymbolP v_name,
           SymbolP v_return_type,
-          Formals& v_formals,
-          Expressions& v_expressions)
+          FormalsP v_formals,
+          ExpressionsP v_expressions)
      : name(v_name), return_type(v_return_type), formals(v_formals),
        expressions(v_expressions) {}
 
@@ -138,12 +138,12 @@ class StaticDispatch : public Expression {
   SymbolP name;
   SymbolP type_name;
   ExpressionP expression;
-  Expressions actual_exprs;
+  ExpressionsP actual_exprs;
 
   StaticDispatch(SymbolP v_name,
                  SymbolP v_type_name,
                  ExpressionP v_expression,
-                 Expressions& v_actual_exprs)
+                 ExpressionsP v_actual_exprs)
     : name(v_name),
       type_name(v_type_name),
       expression(v_expression),
@@ -157,10 +157,10 @@ class Dispatch : public Expression {
  public:
   SymbolP name;
   ExpressionP expression;
-  Expressions actual_exprs;
+  ExpressionsP actual_exprs;
   Dispatch(SymbolP v_name,
            ExpressionP v_expression,
-           Expressions& v_actual_exprs)
+           ExpressionsP v_actual_exprs)
     : name(v_name), expression(v_expression), actual_exprs(v_actual_exprs) {}
 };
 
@@ -192,10 +192,10 @@ class Loop : public Expression {
 class Typcase : public Expression {
  public:
   ExpressionP expression;
-  Cases cases;
+  CasesP cases;
 
   Typcase(ExpressionP v_expression,
-          Cases& v_cases)
+          CasesP v_cases)
     : expression(v_expression),
       cases(v_cases) {}
 
@@ -204,8 +204,8 @@ class Typcase : public Expression {
 
 class Block : public Expression {
  public:
-  Expressions body;
-  Block(Expressions& v_body) : body(v_body) {}
+  ExpressionsP body;
+  Block(ExpressionsP v_body) : body(v_body) {}
   void Dump(std::ostream& stream, int n);
 };
 

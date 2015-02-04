@@ -1,5 +1,10 @@
 #include "symboltab.h"
 using namespace std;
+
+SymbolTable IdTable;
+SymbolTable IntTable;
+SymbolTable StrTable;
+
 SymbolTable::~SymbolTable() {
   for (auto& p : table_) {
     delete p.second;
