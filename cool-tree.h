@@ -32,11 +32,17 @@ typedef class Expression* ExpressionP;
 typedef class Case* CaseP;
 typedef class Assign* AssingP;
 
-typedef std::vector<ClassP>* ClassesP;
-typedef std::vector<FeatureP>* FeaturesP;
-typedef std::vector<FormalP>* FormalsP;
-typedef std::vector<ExpressionP>* ExpressionsP;
-typedef std::vector<CaseP>* CasesP;
+typedef std::vector<ClassP> Classes;
+typedef std::vector<FeatureP> Features;
+typedef std::vector<FormalP> Formals;
+typedef std::vector<ExpressionP> Expressions;
+typedef std::vector<CaseP> Cases;
+
+typedef Classes* ClassesP;
+typedef Features* FeaturesP;
+typedef Formals* FormalsP;
+typedef Expressions* ExpressionsP;
+typedef Cases* CasesP;
 
 class Program : public TreeNode {
  public:
@@ -61,6 +67,7 @@ class Class : public TreeNode {
 };
 
 class Feature : public TreeNode {
+ public:
   virtual void Dump(std::ostream& stream, int n) = 0;
 };
 
@@ -162,6 +169,7 @@ class Dispatch : public Expression {
            ExpressionP v_expression,
            ExpressionsP v_actual_exprs)
     : name(v_name), expression(v_expression), actual_exprs(v_actual_exprs) {}
+  void Dump(std::ostream& stream, int n);
 };
 
 class Cond : public Expression {
@@ -390,5 +398,114 @@ class Object : public Expression {
   void Dump(std::ostream& stream, int n);
 };
 
+ClassesP CreateNilClasses();
+ClassesP CreateSingleClasses(ClassP c);
+ClassesP AppendClass(ClassesP cs, ClassP c);
 
+FeaturesP CreateNilFeatures();
+FeaturesP CreateSingleFeatures(FeatureP f);
+FeaturesP AppendFeature(FeaturesP fs, FeatureP f);
+
+FormalsP CreateNilFormals();
+FormalsP CreateSingleFormals(FormalP f);
+FormalsP AppendFormal(FormalsP fs, FormalP f);
+
+ExpressionsP CreateNilExpressions();
+ExpressionsP CreateSingleExpressions(ExpressionP e);
+ExpressionsP AppendExpressions(ExpressionsP es, ExpressionP e);
+
+CasesP CreateNilCases();
+CasesP CreateSingleCasese(CaseP c);
+CasesP AppendCase(CasesP cs, CaseP c);
+
+ProgramP CreateProgram(ClassesP cs);
+
+ClassP CreateClass(SymbolP name,
+                   SymbolP parent,
+                   SymbolP filename,
+                   FeaturesP features);
+
+FeatureP CreateMethod(SymbolP name,
+                      SymbolP return_type,
+                      FormalsP formals,
+                      ExpressionsP expressions);
+
+FeatureP CreateAttr(SymbolP name,
+                    SymbolP type_decl,
+                    ExpressionP init);
+
+FormalP CreateFormal(SymbolP name,
+                     SymbolP type_decl);
+
+CaseP CreateCase(SymbolP name,
+                 SymbolP type_decl,
+                 ExpressionsP expression);
+
+ExpressionP CreateAssign(SymbolP name,
+                         ExpressionP expression);
+
+ExpressionP CreateStaticDispatch(SymbolP name,
+                                 SymbolP type_name,
+                                 ExpressionP expression,
+                                 ExpressionsP actual_exprs);
+
+ExpressionP CreateDispatch(SymbolP name,
+                           ExpressionP expression,
+                           ExpressionsP actual_exprs);
+
+ExpressionP CreateCond(ExpressionP pred,
+                       ExpressionP then_exp,
+                       ExpressionP else_exp);
+
+ExpressionP CreateLoop(ExpressionP pred,
+                       ExpressionP body);
+
+ExpressionP CreateTypecase(ExpressionP expression,
+                           CasesP cases);
+
+ExpressionP CreateBlock(ExpressionP body);
+
+ExpressionP CreateLeet(SymbolP identifier,
+                       SymbolP type_decl,
+                       ExpressionP init,
+                       ExpressionP body);
+
+ExpressionP CreatePlus(ExpressionP e1,
+                       ExpressionP e2);
+
+ExpressionP CreateSub(ExpressionP e1,
+                      ExpressionP e2);
+
+ExpressionP CreateMul(ExpressionP e1,
+                      ExpressionP e2);
+
+ExpressionP CreateDivide(ExpressionP e1,
+                         ExpressionP e2);
+
+ExpressionP CreateNeg(ExpressionP e);
+
+ExpressionP CreateLt(ExpressionP e1,
+                     ExpressionP e2);
+
+ExpressionP CreateEq(ExpressionP e1,
+                     ExpressionP e2);
+
+ExpressionP CreateLeq(ExpressionP e1,
+                      ExpressionP e2);
+
+ExpressionP CreateComp(ExpressionP e);
+
+ExpressionP CreateIntConst(SymbolP token);
+
+ExpressionP CreateBoolConst(SymbolP val);
+
+ExpressionP CreateString(SymbolP token);
+
+ExpressionP CreateNew(SymbolP type_name);
+
+ExpressionP CreateIsVoid(ExpressionP e);
+
+ExpressionP CreateNoExpr();
+
+ExpressionP CreateObject(SymbolP name);
 #endif

@@ -1,9 +1,16 @@
 #include "symboltab.h"
+#include "helper.h"
 using namespace std;
+using namespace cool_helper;
 
 SymbolTable IdTable;
 SymbolTable IntTable;
 SymbolTable StrTable;
+
+
+void Symbol::Dump(ostream& stream, int n) {
+  stream << PadSpace(n) << str_ << endl;
+}
 
 SymbolTable::~SymbolTable() {
   for (auto& p : table_) {

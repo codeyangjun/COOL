@@ -14,6 +14,7 @@ class Symbol {
   Symbol& operator=(const Symbol& rhs) = delete;
   int GetIndex() const { return index_; }
   const std::string& GetString() const { return str_; }
+  void Dump(std::ostream& stream, int n);
 };
 
 class SymbolTable {

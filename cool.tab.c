@@ -132,16 +132,17 @@
 #include <string>
 #include "symboltab.h"
 #include "cool-tree.h"
-  
 #define YYLTYPE int
 
 using namespace std;
-void yyerror(const std::string& msg);
-extern "C" int yylex();
 
-// ProgramP ast_root;
-// Classes parse_results;
-// int omerrs = 0;
+void yyerror(const std::string& msg);
+int yylex();
+
+
+extern char* curr_filename;
+ProgramP ast_root;
+
 
 
 /* Enabling traces.  */
@@ -164,7 +165,7 @@ extern "C" int yylex();
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 18 "cool.y"
+#line 19 "cool.y"
 {
   bool boolean;
   SymbolP symbol;
@@ -182,7 +183,7 @@ typedef union YYSTYPE
   char *error_msg;
 }
 /* Line 193 of yacc.c.  */
-#line 186 "cool.tab.c"
+#line 187 "cool.tab.c"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -195,7 +196,7 @@ typedef union YYSTYPE
 
 
 /* Line 216 of yacc.c.  */
-#line 199 "cool.tab.c"
+#line 200 "cool.tab.c"
 
 #ifdef short
 # undef short
@@ -479,7 +480,7 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    45,    45
+       0,    84,    84
 };
 #endif
 
@@ -1381,7 +1382,7 @@ yyreduce:
     {
       
 /* Line 1267 of yacc.c.  */
-#line 1385 "cool.tab.c"
+#line 1386 "cool.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1595,7 +1596,7 @@ yyreturn:
 }
 
 
-#line 48 "cool.y"
+#line 87 "cool.y"
 
 
 void yyerror(const std::string& msg) {

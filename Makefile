@@ -7,10 +7,10 @@ ALL=symboltab-test cool-tree-test
 FFLAGS=
 BFLAGS=-d
 
-cool-tree.o: cool-tree.cc cool-tree.h symboltab.h
+cool-tree.o: cool-tree.cc cool-tree.h symboltab.h helper.h
 	$(CC) $(CFLAGS) $< -c -o $@
 
-symboltab.o: symboltab.cc symboltab.h
+symboltab.o: symboltab.cc symboltab.h helper.h
 	$(CC) $(CFLAGS) $< -c -o $@
 
 cool.tab.c, cool.tab.h: cool.y

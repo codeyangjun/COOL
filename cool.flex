@@ -4,13 +4,6 @@
 #include "cool.tab.h"
 #include <iostream>
 
-/*
-#undef YY_INPUT
-#define YY_INPUT(buf,result,max_size) \
-	if ( (result = fread( (char*)buf, sizeof(char), max_size, fin)) < 0) \
-		YY_FATAL_ERROR( "read() in flex scanner failed");
-*/
-
 #define MAX_STR_CONST 1025
 #define YY_NO_UNPUT   /* keep g++ happy */
 

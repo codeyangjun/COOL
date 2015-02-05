@@ -173,4 +173,13 @@ std::string ToEscapedString(const std::string& str) {
 }
 
 
+// 80 spaces for padding
+static const char *padding = "                                                                                ";
+
+const char* PadSpace(int n) {
+  if (n > 80) return padding;
+  if (n <= 0) return "";
+  return padding + (80 - n);
+}
+
 } // namespace cool_helper

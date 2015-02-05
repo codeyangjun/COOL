@@ -11,6 +11,7 @@ std::string TokenToString(int tok);
 void DumpCoolToken(std::ostream& out, int lineno, int token, YYSTYPE yylval);
 std::string ToEscapedString(const std::string& str);
 void Init(int* argc, char *argv[]);
+const char* PadSpace(int n);
 } // namespace cool_helper
 
 #endif
