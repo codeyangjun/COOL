@@ -34,9 +34,7 @@ Dump(ostream& stream, int n) {
 
   return_type->Dump(stream, n + 2);
 
-  for (auto& p : *expressions) {
-    p->Dump(stream, n + 2);
-  }
+  expression->Dump(stream, n + 2);
 }
 
 void Attr::
@@ -288,7 +286,7 @@ CasesP CreateNilCases() {
   return new Cases();
 }
 
-CasesP CreateSingleCasese(CaseP c) {
+CasesP CreateSingleCases(CaseP c) {
   return AppendCase(new Cases(), c);
 }
 
@@ -311,8 +309,8 @@ ClassP CreateClass(SymbolP name,
 FeatureP CreateMethod(SymbolP name,
                       SymbolP return_type,
                       FormalsP formals,
-                      ExpressionsP expressions) {
-  return new Method(name, return_type, formals, expressions);
+                      ExpressionP expression) {
+  return new Method(name, return_type, formals, expression);
 }
 
 FeatureP CreateAttr(SymbolP name,
@@ -424,7 +422,7 @@ ExpressionP CreateIntConst(SymbolP token) {
   return new IntConst(token);
 }
 
-ExpressionP CreateBoolConst(SymbolP val) {
+ExpressionP CreateBoolConst(bool val) {
   return new BoolConst(val);
 }
 

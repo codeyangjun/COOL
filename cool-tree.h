@@ -76,14 +76,14 @@ class Method : public Feature {
    SymbolP name;
    SymbolP return_type;
    FormalsP formals;
-   ExpressionsP expressions;
+   ExpressionP expression;
 
    Method(SymbolP v_name,
           SymbolP v_return_type,
           FormalsP v_formals,
-          ExpressionsP v_expressions)
+          ExpressionP v_expression)
      : name(v_name), return_type(v_return_type), formals(v_formals),
-       expressions(v_expressions) {}
+       expression(v_expression) {}
 
    void Dump(std::ostream& stream, int n);
 };
@@ -415,7 +415,7 @@ ExpressionsP CreateSingleExpressions(ExpressionP e);
 ExpressionsP AppendExpression(ExpressionsP es, ExpressionP e);
 
 CasesP CreateNilCases();
-CasesP CreateSingleCasese(CaseP c);
+CasesP CreateSingleCases(CaseP c);
 CasesP AppendCase(CasesP cs, CaseP c);
 
 ProgramP CreateProgram(ClassesP cs);
@@ -428,7 +428,7 @@ ClassP CreateClass(SymbolP name,
 FeatureP CreateMethod(SymbolP name,
                       SymbolP return_type,
                       FormalsP formals,
-                      ExpressionsP expressions);
+                      ExpressionP expression);
 
 FeatureP CreateAttr(SymbolP name,
                     SymbolP type_decl,
@@ -497,7 +497,7 @@ ExpressionP CreateComp(ExpressionP e);
 
 ExpressionP CreateIntConst(SymbolP token);
 
-ExpressionP CreateBoolConst(SymbolP val);
+ExpressionP CreateBoolConst(bool val);
 
 ExpressionP CreateStringConst(SymbolP token);
 

@@ -37,6 +37,11 @@ helper-test: helper-test.o helper.o
 cool-lexer: lex-test.o lex.yy.o symboltab.o cool-tree.o helper.o
 	$(CC) $(CFLAGS) $(FLEX_LIBS) $^ -o $@ 
 
+cool.tab.o: cool.tab.c cool.tab.h cool-tree.h symboltab.h
+	$(CC) $(CFLAGS) $< -c -o $@
+
+cool-parser: parser-test.o cool.tab.o lex.yy.o symboltab.o cool-tree.o helper.o
+	$(CC) $(CFLAGS) $(FLEX_LIBS) $^ -o $@
 
 clean:
 	rm *.o

@@ -11,7 +11,6 @@ char string_buf[MAX_STR_CONST]; /* to assemble string constants */
 char *string_buf_ptr;
 
 extern int curr_lineno;
-extern int verbose_flag;
 
 #define STR_TOO_LONG "String constant too long"
 #define STR_NULL_CHAR "String contains null character."
