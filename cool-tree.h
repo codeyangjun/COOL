@@ -361,10 +361,10 @@ class BoolConst : public Expression {
    void Dump(std::ostream& stream, int n);
 };
 
-class String : public Expression {
+class StringConst : public Expression {
  public:
    SymbolP token;
-   String(SymbolP v_token) : token(v_token) {}
+   StringConst(SymbolP v_token) : token(v_token) {}
 
    void Dump(std::ostream& stream, int n);
 };
@@ -412,7 +412,7 @@ FormalsP AppendFormal(FormalsP fs, FormalP f);
 
 ExpressionsP CreateNilExpressions();
 ExpressionsP CreateSingleExpressions(ExpressionP e);
-ExpressionsP AppendExpressions(ExpressionsP es, ExpressionP e);
+ExpressionsP AppendExpression(ExpressionsP es, ExpressionP e);
 
 CasesP CreateNilCases();
 CasesP CreateSingleCasese(CaseP c);
@@ -439,7 +439,7 @@ FormalP CreateFormal(SymbolP name,
 
 CaseP CreateCase(SymbolP name,
                  SymbolP type_decl,
-                 ExpressionsP expression);
+                 ExpressionP expression);
 
 ExpressionP CreateAssign(SymbolP name,
                          ExpressionP expression);
@@ -463,9 +463,9 @@ ExpressionP CreateLoop(ExpressionP pred,
 ExpressionP CreateTypecase(ExpressionP expression,
                            CasesP cases);
 
-ExpressionP CreateBlock(ExpressionP body);
+ExpressionP CreateBlock(ExpressionsP body);
 
-ExpressionP CreateLeet(SymbolP identifier,
+ExpressionP CreateLet(SymbolP identifier,
                        SymbolP type_decl,
                        ExpressionP init,
                        ExpressionP body);
@@ -499,7 +499,7 @@ ExpressionP CreateIntConst(SymbolP token);
 
 ExpressionP CreateBoolConst(SymbolP val);
 
-ExpressionP CreateString(SymbolP token);
+ExpressionP CreateStringConst(SymbolP token);
 
 ExpressionP CreateNew(SymbolP type_name);
 
