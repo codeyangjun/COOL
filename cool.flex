@@ -10,7 +10,7 @@
 char string_buf[MAX_STR_CONST]; /* to assemble string constants */
 char *string_buf_ptr;
 
-extern int curr_lineno;
+// extern int curr_lineno;
 
 #define STR_TOO_LONG "String constant too long"
 #define STR_NULL_CHAR "String contains null character."
@@ -27,6 +27,9 @@ static int escape_null_char = 0;
 static int comment_level = 0;
 
 %}
+
+/* let flex maintains line number for us */
+%option yylineno
 
 /*
  * Define names for regular expressions here.
@@ -261,7 +264,7 @@ String {
     return ERROR;
   }
 
-  ++curr_lineno;
+  // ++curr_lineno;
   yylval.error_msg = STR_UNTER;
   return ERROR;
 }
@@ -324,7 +327,7 @@ String {
 
 {WHITESPACE} {
   if (yytext[yyleng-1] == '\n') {
-    ++curr_lineno;
+    // ++curr_lineno;
   }
 }
 
@@ -355,7 +358,7 @@ String {
 }
 
 <COMMENT>\n {
-  ++curr_lineno;
+  // ++curr_lineno;
 }
 
 "*)" {

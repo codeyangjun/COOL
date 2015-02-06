@@ -4,12 +4,12 @@
 #include "helper.h"
 using namespace std;
 
-int curr_lineno = 1;
 char* curr_filename = "<stdin>";
 FILE *fin;
 
 extern int yylex();
 extern FILE* yyin;
+extern int yylineno;
 
 YYSTYPE yylval;
 
@@ -26,7 +26,7 @@ int main(int argc, char **argv) {
     cout << "#name " << argv[argc-1] << endl;
     int token = 0;
     while ((token = yylex()) != 0) {
-      cool_helper::DumpCoolToken(cout, curr_lineno, token, yylval);
+      cool_helper::DumpCoolToken(cout, yylineno, token, yylval);
     }
     fclose(yyin);
     exit(0);

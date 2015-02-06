@@ -1,5 +1,9 @@
 #!/bin/sh
 
+_red='\033[1;31m'
+_green='\033[1;32m'
+_reset='\033[0m'
+
 rm cool-lexer
 make cool-lexer
 
@@ -20,9 +24,9 @@ for infile in $infiles; do
 
   if [ $? -eq 0 ]; then
     correct_cnt=$((correct_cnt+1))
-    echo "[PASS]\t$infile"
+    echo "[${_green}PASS${_reset}]\t$infile"
   else
-    echo "[FAILE]\t$infile"
+    echo "[${_red}FAILE${_reset}]\t$infile"
     echo "-----------------------------------------------------------------"
     echo "left column is mylexer output, right column is correct output"
     echo "-----------------------------------------------------------------"
@@ -34,7 +38,7 @@ for infile in $infiles; do
 
   cnt=$((cnt+1))
 done
-
-echo "Cool-Lexer Score: ${correct_cnt}/${cnt}"
+echo ""
+echo "[cool-lexer Score] ${correct_cnt}/${cnt}"
 
 rm A B diff.out
