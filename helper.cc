@@ -182,4 +182,12 @@ const char* PadSpace(int n) {
   return padding + (80 - n);
 }
 
+void DumpLine(ostream& out, int n, int line) {
+  out << PadSpace(n) << "#" << line << endl;
+}
+
+void DumpType(ostream& stream, int n, const std::string& type) {
+  stream << PadSpace(n) << ": " << (type == "" ? "_no_type" : type) << endl;
+}
+
 } // namespace cool_helper

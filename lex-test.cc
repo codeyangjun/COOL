@@ -10,7 +10,6 @@ FILE *fin;
 
 extern int yylex();
 extern FILE* yyin;
-extern int yy_flex_debug;
 
 YYSTYPE yylval;
 
@@ -18,7 +17,7 @@ int main(int argc, char **argv) {
   cool_helper::Init(&argc, argv);
 
   for (int i = 1; i < argc; ++i) {
-    FILE* fin = fopen(argv[argc-1], "r");
+    FILE* fin = fopen(argv[i], "r");
     if (fin == nullptr) {
       cerr << "Could not open input file " << argv[argc-1] << ", skip." << endl;
       continue;

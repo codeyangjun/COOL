@@ -13,11 +13,14 @@ class TreeNode {
   Type type_; 
 
  public:
-  TreeNode() {}
+  TreeNode() { type_ = ""; }
   virtual ~TreeNode() {}
   virtual void Dump(std::ostream& stream, int n) = 0;
+  virtual void DumpWithTypes(std::ostream& stream, int n) = 0;
   void SetType(const Type& type) { type_ = type; }
   const Type& GetType() const { return type_; }
+  int GetLine() const { return line_number_; }
+  void SetLine(int line) { line_number_ = line; }
   TreeNode(const TreeNode& rhs) = delete;
   TreeNode& operator=(const TreeNode& rhs)  = delete;
 };
@@ -49,6 +52,7 @@ class Program : public TreeNode {
   ClassesP classes;
   Program(ClassesP cl) : classes(cl) {}
   void Dump(std::ostream& stream, int n);
+  void DumpWithTypes(std::ostream& stream, int n);
 };
 
 class Class : public TreeNode {
@@ -64,11 +68,13 @@ class Class : public TreeNode {
       filename(v_filename), features(v_features) {}
 
   void Dump(std::ostream& stream, int n);
+  void DumpWithTypes(std::ostream& stream, int n);
 };
 
 class Feature : public TreeNode {
  public:
   virtual void Dump(std::ostream& stream, int n) = 0;
+  virtual void DumpWithTypes(std::ostream& stream, int n) = 0;
 };
 
 class Method : public Feature {
@@ -86,6 +92,7 @@ class Method : public Feature {
        expression(v_expression) {}
 
    void Dump(std::ostream& stream, int n);
+   void DumpWithTypes(std::ostream& stream, int n);
 };
 
 class Attr : public Feature {
@@ -100,6 +107,7 @@ class Attr : public Feature {
     : name(v_name), type_decl(v_type_decl), init(v_init) {}
 
   void Dump(std::ostream& stream, int n);
+   void DumpWithTypes(std::ostream& stream, int n);
 };
 
 class Formal : public TreeNode {
@@ -109,6 +117,7 @@ class Formal : public TreeNode {
   Formal(SymbolP v_name, SymbolP v_type_decl)
     : name(v_name), type_decl(v_type_decl) {}
   void Dump(std::ostream& stream, int n);
+  void DumpWithTypes(std::ostream& stream, int n);
 };
 
 class Case : public TreeNode {
@@ -123,11 +132,13 @@ class Case : public TreeNode {
      : name(v_name), type_decl(v_type_decl), expression(v_expression) {}
   
    void Dump(std::ostream& stream, int n );
+   void DumpWithTypes(std::ostream& stream, int n);
 };
 
 class Expression : public TreeNode {
  public:
    virtual void Dump(std::ostream& stream, int n) = 0;
+   virtual void DumpWithTypes(std::ostream& stream, int n) = 0;
 };
 
 class Assign : public Expression {
@@ -137,6 +148,7 @@ class Assign : public Expression {
   Assign(SymbolP v_name, ExpressionP v_expression)
     : name(v_name), expression(v_expression) {}
   void Dump(std::ostream& stream, int n);
+  void DumpWithTypes(std::ostream& stream, int n);
 };
 
 // expression@type_name.name(actual_exprs)
@@ -157,7 +169,7 @@ class StaticDispatch : public Expression {
       actual_exprs(v_actual_exprs) {}
 
   void Dump(std::ostream& stream, int n);
-
+  void DumpWithTypes(std::ostream& stream, int n);
 };
 
 class Dispatch : public Expression {
@@ -170,6 +182,7 @@ class Dispatch : public Expression {
            ExpressionsP v_actual_exprs)
     : name(v_name), expression(v_expression), actual_exprs(v_actual_exprs) {}
   void Dump(std::ostream& stream, int n);
+  void DumpWithTypes(std::ostream& stream, int n);
 };
 
 class Cond : public Expression {
@@ -183,6 +196,7 @@ class Cond : public Expression {
         ExpressionP v_else_exp)
      : pred(v_pred), then_exp(v_then_exp), else_exp(v_else_exp) {}
    void Dump(std::ostream& stream, int n);
+   void DumpWithTypes(std::ostream& stream, int n);
 };
 
 class Loop : public Expression {
@@ -195,6 +209,7 @@ class Loop : public Expression {
     : pred(v_pred), body(v_body) {}
 
   void Dump(std::ostream& stream, int n);
+  void DumpWithTypes(std::ostream& stream, int n);
 };
 
 class Typcase : public Expression {
@@ -208,6 +223,7 @@ class Typcase : public Expression {
       cases(v_cases) {}
 
   void Dump(std::ostream& stream, int n);
+  void DumpWithTypes(std::ostream& stream, int n);
 };
 
 class Block : public Expression {
@@ -215,6 +231,7 @@ class Block : public Expression {
   ExpressionsP body;
   Block(ExpressionsP v_body) : body(v_body) {}
   void Dump(std::ostream& stream, int n);
+  void DumpWithTypes(std::ostream& stream, int n);
 };
 
 class Let : public Expression {
@@ -234,6 +251,7 @@ class Let : public Expression {
       body(v_body) {}
 
   void Dump(std::ostream& stream, int n);
+  void DumpWithTypes(std::ostream& stream, int n);
 };
 
 class Plus : public Expression {
@@ -245,7 +263,8 @@ class Plus : public Expression {
      : e1(v_e1),
        e2(v_e2) {}
 
-   void Dump(std::ostream& stream, int n);
+  void Dump(std::ostream& stream, int n);
+  void DumpWithTypes(std::ostream& stream, int n);
 };
 
 class Sub : public Expression {
@@ -258,6 +277,7 @@ class Sub : public Expression {
     : e1(v_e1), e2(v_e2) {}
 
   void Dump(std::ostream& stream, int n);
+  void DumpWithTypes(std::ostream& stream, int n);
 };
 
 class Mul : public Expression {
@@ -270,7 +290,8 @@ class Mul : public Expression {
      : e1(v_e1),
        e2(v_e2) {}
 
-   void Dump(std::ostream& stream, int n);
+  void Dump(std::ostream& stream, int n);
+  void DumpWithTypes(std::ostream& stream, int n);
 };
 
 class Divide : public Expression {
@@ -283,7 +304,8 @@ class Divide : public Expression {
      : e1(v_e1),
        e2(v_e2) {}
 
-   void Dump(std::ostream& stream, int n);
+  void Dump(std::ostream& stream, int n);
+  void DumpWithTypes(std::ostream& stream, int n);
 };
 
 class Neg : public Expression {
@@ -292,7 +314,8 @@ class Neg : public Expression {
 
    Neg(ExpressionP v_e) : e(v_e) {}
 
-   void Dump(std::ostream& stream, int n);
+  void Dump(std::ostream& stream, int n);
+  void DumpWithTypes(std::ostream& stream, int n);
 };
 
 class Lt : public Expression {
@@ -305,7 +328,8 @@ class Lt : public Expression {
      : e1(v_e1),
        e2(v_e2) {}
 
-   void Dump(std::ostream& stream, int n);
+  void Dump(std::ostream& stream, int n);
+  void DumpWithTypes(std::ostream& stream, int n);
 };
 
 class Eq : public Expression {
@@ -318,7 +342,8 @@ class Eq : public Expression {
      : e1(v_e1),
        e2(v_e2) {}
 
-   void Dump(std::ostream& stream, int n);
+  void Dump(std::ostream& stream, int n);
+  void DumpWithTypes(std::ostream& stream, int n);
 };
 
 class Leq : public Expression {
@@ -331,7 +356,8 @@ class Leq : public Expression {
      : e1(v_e1),
        e2(v_e2) {}
 
-   void Dump(std::ostream& stream, int n);
+  void Dump(std::ostream& stream, int n);
+  void DumpWithTypes(std::ostream& stream, int n);
 };
 
 class Comp : public Expression {
@@ -340,7 +366,8 @@ class Comp : public Expression {
 
    Comp(ExpressionP v_e) : e(v_e) {}
 
-   void Dump(std::ostream& stream, int n);
+  void Dump(std::ostream& stream, int n);
+  void DumpWithTypes(std::ostream& stream, int n);
 };
 
 class IntConst : public Expression {
@@ -350,6 +377,7 @@ class IntConst : public Expression {
   IntConst(SymbolP v_token) : token(v_token) {}
 
   void Dump(std::ostream& stream, int n);
+  void DumpWithTypes(std::ostream& stream, int n);
 };
 
 class BoolConst : public Expression {
@@ -358,7 +386,8 @@ class BoolConst : public Expression {
 
    BoolConst(bool v_val) : val(v_val) {}
 
-   void Dump(std::ostream& stream, int n);
+  void Dump(std::ostream& stream, int n);
+  void DumpWithTypes(std::ostream& stream, int n);
 };
 
 class StringConst : public Expression {
@@ -366,7 +395,8 @@ class StringConst : public Expression {
    SymbolP token;
    StringConst(SymbolP v_token) : token(v_token) {}
 
-   void Dump(std::ostream& stream, int n);
+  void Dump(std::ostream& stream, int n);
+  void DumpWithTypes(std::ostream& stream, int n);
 };
 
 class New : public Expression {
@@ -375,7 +405,8 @@ class New : public Expression {
 
    New(SymbolP v_type_name) : type_name(v_type_name) {}
 
-   void Dump(std::ostream& stream, int n);
+  void Dump(std::ostream& stream, int n);
+  void DumpWithTypes(std::ostream& stream, int n);
 };
 
 class IsVoid : public Expression {
@@ -383,12 +414,14 @@ class IsVoid : public Expression {
    ExpressionP e;
    IsVoid(ExpressionP v_e) : e(v_e) {}
    void Dump(std::ostream& stream, int n);
+   void DumpWithTypes(std::ostream& stream, int n);
 };
 
 class NoExpr : public Expression {
  public:
    NoExpr() {}
    void Dump(std::ostream& stream, int n);
+   void DumpWithTypes(std::ostream& stream, int n);
 };
 
 class Object : public Expression {
@@ -396,6 +429,7 @@ class Object : public Expression {
   SymbolP name;
   Object(SymbolP v_name) : name(v_name) {}
   void Dump(std::ostream& stream, int n);
+  void DumpWithTypes(std::ostream& stream, int n);
 };
 
 ClassesP CreateNilClasses();
@@ -508,4 +542,5 @@ ExpressionP CreateIsVoid(ExpressionP e);
 ExpressionP CreateNoExpr();
 
 ExpressionP CreateObject(SymbolP name);
+
 #endif

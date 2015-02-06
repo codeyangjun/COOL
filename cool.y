@@ -1,19 +1,18 @@
 %{
-#include <iostream>
-#include <string>
+#include <iostream> #include <string>
 #include "symboltab.h"
 #include "cool-tree.h"
+#include "helper.h"
 // #define YYLTYPE int
 
 using namespace std;
 
-void yyerror(const std::string& msg);
+void yyerror(char *s);
 extern int yylex();
-
-
 extern char* curr_filename;
-ProgramP ast_root;
+ProgramP ast_root = nullptr;
 
+int err_cnt = 0;
 %}
 
 %union {
@@ -70,7 +69,9 @@ ProgramP ast_root;
 
 %%
 
-program : class_list { @$ = @1; ast_root = CreateProgram($1); }
+program : class_list { 
+                        @$ = @1; ast_root = CreateProgram($1);
+                     }
         ;
 
 class_list : class { $$ = CreateSingleClasses($1); }
@@ -179,5 +180,14 @@ expr : OBJECTID ASSIGN expr { $$ = CreateAssign($1, $3); }
 
 %%
 
-void yyerror(const std::string& msg) {
+void yyerror(char *s) {
+  extern int curr_lineno;
+  cerr << "\"" << curr_filename << "\", line " << curr_lineno << ": " \
+       << s << " at or near "
+       << cool_helper::TokenToString(yychar) << endl;
+  ++err_cnt;
+  if (err_cnt > 50) {
+    cerr << "More than 50 errors" << endl;
+    exit(1);
+  }
 }

@@ -5,7 +5,7 @@ using namespace cool_helper;
 
 void Program::
 Dump(ostream& stream, int n) {
-  stream << PadSpace(n) << "program\n";
+  stream << PadSpace(n) << "_program\n";
   for (const auto& p : *classes) {
     p->Dump(stream, n+2);
   }
@@ -444,4 +444,288 @@ ExpressionP CreateNoExpr() {
 
 ExpressionP CreateObject(SymbolP name) {
   return new Object(name);
+}
+
+void
+Program::DumpWithTypes(ostream& stream, int n) {
+  DumpLine(stream, n, line_number_);
+  stream << PadSpace(n) << "_program" << endl;
+  for (auto& p : *classes) {
+    p->DumpWithTypes(stream, n + 2);
+  }
+}
+
+void
+Class::
+DumpWithTypes(ostream& stream, int n) {
+  DumpLine(stream, n, line_number_);
+  stream << PadSpace(n) << "_class" << endl;
+  name->Dump(stream, n + 2);
+  parent->Dump(stream, n + 2);
+  stream << PadSpace(n + 2) << "\""
+         << ToEscapedString(filename->GetString())
+         << "\"\n" << PadSpace(n + 2) << "(\n";
+  for (auto& feature : *features) {
+    feature->DumpWithTypes(stream, n + 2);
+  }
+  stream << PadSpace(n + 2) << ")\n";
+}
+
+void Method::
+DumpWithTypes(ostream& stream, int n) {
+  DumpLine(stream, n, line_number_);
+  stream << PadSpace(n) << "_method" << endl;
+  name->Dump(stream, n + 2);
+  for (auto& formal : *formals) {
+    formal->DumpWithTypes(stream, n + 2);
+  }
+  return_type->Dump(stream, n + 2);
+  expression->DumpWithTypes(stream, n + 2);
+}
+
+void Attr::
+DumpWithTypes(ostream& stream, int n) {
+  DumpLine(stream, n, line_number_);
+  stream << PadSpace(n) << "_attr" << endl;
+  name->Dump(stream, n + 2);
+  type_decl->Dump(stream, n + 2);
+  init->DumpWithTypes(stream, n + 2);
+}
+
+void Formal::
+DumpWithTypes(ostream& stream, int n) {
+  DumpLine(stream, n, line_number_);
+  stream << PadSpace(n) << "_formal" << endl;
+  name->Dump(stream, n + 2);
+  type_decl->Dump(stream, n + 2);
+}
+
+void Case::
+DumpWithTypes(ostream& stream, int n) {
+  DumpLine(stream, n, line_number_);
+  stream << PadSpace(n) << "_branch" << endl;
+  name->Dump(stream, n + 2);
+  type_decl->Dump(stream, n + 2);
+  expression->DumpWithTypes(stream, n + 2);
+}
+
+void Assign::
+DumpWithTypes(ostream& stream, int n) {
+  DumpLine(stream, n, line_number_);
+  stream << PadSpace(n) << "_assign" << endl;
+  name->Dump(stream, n + 2);
+  expression->Dump(stream, n + 2);
+  DumpType(stream, n, type_);
+}
+
+void StaticDispatch::
+DumpWithTypes(ostream& stream, int n) {
+  DumpLine(stream, n, line_number_);
+  stream << PadSpace(n + 2) << "_static_dispatch" << endl;
+  expression->DumpWithTypes(stream, n + 2);
+  stream << PadSpace(n + 2) << "(" << endl;
+  for (auto& p : *actual_exprs) {
+    p->DumpWithTypes(stream, n + 2);
+  }
+  stream << PadSpace(n + 2) << ")\n";
+  DumpType(stream, n, type_);
+}
+
+void Dispatch::
+DumpWithTypes(ostream& stream, int n) {
+  DumpLine(stream, n, line_number_);
+  stream << PadSpace(n) << "_dispatch\n";
+  expression->DumpWithTypes(stream, n + 2);
+  name->Dump(stream, n + 2);
+  stream << PadSpace(n + 2) << "(\n";
+  for (auto& p : *actual_exprs) {
+    p->DumpWithTypes(stream, n + 2);
+  }
+  stream << PadSpace(n + 2) << ")" << endl;
+  DumpType(stream, n, type_);
+}
+
+void Cond::
+DumpWithTypes(ostream& stream, int n) {
+  DumpLine(stream, n, line_number_);
+  stream << PadSpace(n) << "_cond" << endl;
+  pred->DumpWithTypes(stream, n + 2);
+  then_exp->DumpWithTypes(stream, n + 2);
+  else_exp->DumpWithTypes(stream, n + 2);
+  DumpType(stream, n, type_);
+}
+
+void Loop::
+DumpWithTypes(ostream& stream, int n) {
+  DumpLine(stream, n, line_number_);
+  stream << PadSpace(n) << "_loop" << endl;
+  pred->DumpWithTypes(stream, n + 2);
+  body->DumpWithTypes(stream, n + 2);
+  DumpType(stream, n, type_);
+}
+
+void Typcase::
+DumpWithTypes(ostream& stream, int n) {
+  DumpLine(stream, n, line_number_);
+  stream << PadSpace(n) << "_typcase" << endl;
+  expression->DumpWithTypes(stream, n + 2);
+  for (auto& p : *cases) {
+    p->DumpWithTypes(stream, n + 2);
+  }
+  DumpType(stream, n, type_);
+}
+
+void Block::
+DumpWithTypes(ostream& stream, int n) {
+  DumpLine(stream, n, line_number_);
+  stream << PadSpace(n) << "_block" << endl;
+  for (auto& p : *body) {
+    p->DumpWithTypes(stream, n + 2);
+  }
+  DumpType(stream, n, type_);
+}
+
+void Let::
+DumpWithTypes(ostream& stream, int n) {
+  DumpLine(stream, n, line_number_);
+  stream << PadSpace(n) << "_let" << endl;
+  identifier->Dump(stream, n + 2);
+  type_decl->Dump(stream, n + 2);
+  init->DumpWithTypes(stream, n + 2);
+  body->DumpWithTypes(stream, n + 2);
+  DumpType(stream, n, type_);
+}
+
+void Plus::
+DumpWithTypes(ostream& stream, int n) {
+  DumpLine(stream, n, line_number_);
+  stream << PadSpace(n) << "_plus" << endl;
+  e1->DumpWithTypes(stream, n + 2);
+  e2->DumpWithTypes(stream, n + 2);
+  DumpType(stream, n, type_);
+}
+
+void Sub::
+DumpWithTypes(ostream& stream, int n) {
+  DumpLine(stream, n, line_number_);
+  stream << PadSpace(n) << "_sub" << endl;
+  e1->DumpWithTypes(stream, n + 2);
+  e2->DumpWithTypes(stream, n + 2);
+  DumpType(stream, n, type_);
+}
+
+void Mul::
+DumpWithTypes(ostream& stream, int n) {
+  DumpLine(stream, n, line_number_);
+  stream << PadSpace(n) << "_mul" << endl;
+  e1->DumpWithTypes(stream, n + 2);
+  e2->DumpWithTypes(stream, n + 2);
+  DumpType(stream, n, type_);
+}
+
+void Divide::
+DumpWithTypes(ostream& stream, int n) {
+  DumpLine(stream, n, line_number_);
+  stream << PadSpace(n) << "_divide" << endl;
+  e1->DumpWithTypes(stream, n + 2);
+  e2->DumpWithTypes(stream, n + 2);
+  DumpType(stream, n, type_);
+}
+
+void Neg::
+DumpWithTypes(ostream& stream, int n) {
+  DumpLine(stream, n, line_number_);
+  stream << PadSpace(n) << "_neg" << endl;
+  e->DumpWithTypes(stream, n + 2);
+  DumpType(stream, n, type_);
+}
+
+void Lt::
+DumpWithTypes(ostream& stream, int n) {
+  DumpLine(stream, n, line_number_);
+  stream << PadSpace(n) << "_lt" << endl;
+  e1->DumpWithTypes(stream, n + 2);
+  e2->DumpWithTypes(stream, n + 2);
+  DumpType(stream, n, type_);
+}
+
+void Eq::
+DumpWithTypes(ostream& stream, int n) {
+  DumpLine(stream, n, line_number_);
+  stream << PadSpace(n) << "_eq" << endl;
+  e1->DumpWithTypes(stream, n + 2);
+  e2->DumpWithTypes(stream, n + 2);
+  DumpType(stream, n, type_);
+}
+
+void Leq::
+DumpWithTypes(ostream& stream, int n) {
+  DumpLine(stream, n, line_number_);
+  stream << PadSpace(n) << "_leq" << endl;
+  e1->DumpWithTypes(stream, n + 2);
+  e2->DumpWithTypes(stream, n + 2);
+  DumpType(stream, n, type_);
+}
+
+void Comp::
+DumpWithTypes(ostream& stream, int n) {
+  DumpLine(stream, n, line_number_);
+  stream << PadSpace(n) << "_comp" << endl;
+  e->DumpWithTypes(stream, n + 2);
+  DumpType(stream, n, type_);
+}
+
+void IntConst::
+DumpWithTypes(ostream& stream, int n) {
+  DumpLine(stream, n, line_number_);
+  stream << PadSpace(n) << "_int" << endl;
+  token->Dump(stream, n + 2);
+  DumpType(stream, n, type_);
+}
+
+void BoolConst::
+DumpWithTypes(ostream& stream, int n) {
+  DumpLine(stream, n, line_number_);
+  stream << PadSpace(n) << "_bool" << endl;
+  stream << PadSpace(n+2) << (val ? "true" : "false") << endl;
+  DumpType(stream, n, type_);
+}
+
+void StringConst::
+DumpWithTypes(ostream& stream, int n) {
+  DumpLine(stream, n, line_number_);
+  stream << PadSpace(n) << "_string" << endl;
+  stream << PadSpace(n + 2) << "\""
+         << ToEscapedString(token->GetString()) << "\"" << endl;
+  DumpType(stream, n, type_);
+}
+
+void New::
+DumpWithTypes(ostream& stream, int n) {
+  DumpLine(stream, n, line_number_);
+  stream << PadSpace(n) << "_new" << endl;
+  type_name->Dump(stream, n + 2);
+  DumpType(stream, n, type_);
+}
+
+void IsVoid::
+DumpWithTypes(ostream& stream, int n) {
+  DumpLine(stream, n, line_number_);
+  stream << PadSpace(n) << "_isvoid" << endl;
+  e->Dump(stream, n + 2);
+  DumpType(stream, n, type_);
+}
+
+void NoExpr::
+DumpWithTypes(ostream& stream, int n) {
+  DumpLine(stream, n, line_number_);
+  stream << PadSpace(n) << "_no_expr" << endl;
+  DumpType(stream, n, type_);
+}
+
+void Object::
+DumpWithTypes(ostream& stream, int n) {
+  DumpLine(stream, n, line_number_);
+  stream << PadSpace(n) << "_object" << endl;
+  DumpType(stream, n, type_);
 }
