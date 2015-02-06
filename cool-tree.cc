@@ -295,155 +295,174 @@ CasesP AppendCase(CasesP cs, CaseP c) {
   return cs;
 }
 
-ProgramP CreateProgram(ClassesP cs) {
-  return new Program(cs);
+ProgramP CreateProgram(ClassesP cs, int lineno) {
+  return new Program(cs, lineno);
 }
 
 ClassP CreateClass(SymbolP name,
                    SymbolP parent,
                    SymbolP filename,
-                   FeaturesP features) {
-  return new Class(name, parent, filename, features);
+                   FeaturesP features,
+                   int lineno) {
+  return new Class(name, parent, filename, features, lineno);
 }
 
 FeatureP CreateMethod(SymbolP name,
                       SymbolP return_type,
                       FormalsP formals,
-                      ExpressionP expression) {
-  return new Method(name, return_type, formals, expression);
+                      ExpressionP expression,
+                      int lineno) {
+  return new Method(name, return_type, formals, expression, lineno);
 }
 
 FeatureP CreateAttr(SymbolP name,
                     SymbolP type_decl,
-                    ExpressionP init) {
-  return new Attr(name, type_decl, init);
+                    ExpressionP init,
+                    int lineno) {
+  return new Attr(name, type_decl, init, lineno);
 }
 
 FormalP CreateFormal(SymbolP name,
-                     SymbolP type_decl) {
-  return new Formal(name, type_decl);
+                     SymbolP type_decl,
+                     int lineno) {
+  return new Formal(name, type_decl, lineno);
 }
 
 CaseP CreateCase(SymbolP name,
                  SymbolP type_decl,
-                 ExpressionP expression) {
-  return new Case(name, type_decl, expression);
+                 ExpressionP expression,
+                 int lineno) {
+  return new Case(name, type_decl, expression, lineno);
 }
 
 ExpressionP CreateAssign(SymbolP name,
-                         ExpressionP expression) {
-  return new Assign(name, expression);
+                         ExpressionP expression,
+                         int lineno) {
+  return new Assign(name, expression, lineno);
 }
 
 ExpressionP CreateStaticDispatch(SymbolP name,
                                  SymbolP type_name,
                                  ExpressionP expression,
-                                 ExpressionsP actual_exprs) {
-  return new StaticDispatch(name, type_name, expression, actual_exprs);
+                                 ExpressionsP actual_exprs,
+                                 int lineno) {
+  return new StaticDispatch(name, type_name, expression, actual_exprs, lineno);
 }
 
 ExpressionP CreateDispatch(SymbolP name,
                            ExpressionP expression,
-                           ExpressionsP actual_exprs) {
-  return new Dispatch(name, expression, actual_exprs);
+                           ExpressionsP actual_exprs,
+                           int lineno) {
+  return new Dispatch(name, expression, actual_exprs, lineno);
 }
 
 ExpressionP CreateCond(ExpressionP pred,
                        ExpressionP then_exp,
-                       ExpressionP else_exp) {
-  return new Cond(pred, then_exp, else_exp);
+                       ExpressionP else_exp,
+                       int lineno) {
+  return new Cond(pred, then_exp, else_exp, lineno);
 }
 
 ExpressionP CreateLoop(ExpressionP pred,
-                       ExpressionP body) {
+                       ExpressionP body,
+                       int lineno) {
   return new Loop(pred, body);
 }
 
 ExpressionP CreateTypecase(ExpressionP expression,
-                           CasesP cases) {
+                           CasesP cases,
+                           int lineno) {
   return new Typcase(expression, cases);
 }
 
-ExpressionP CreateBlock(ExpressionsP body) {
-  return new Block(body);
+ExpressionP CreateBlock(ExpressionsP body, int lineno) {
+  return new Block(body, lineno);
 }
 
 ExpressionP CreateLet(SymbolP identifier,
                        SymbolP type_decl,
                        ExpressionP init,
-                       ExpressionP body) {
-  return new Let(identifier, type_decl, init, body);
+                       ExpressionP body,
+                       int lineno) {
+  return new Let(identifier, type_decl, init, body, lineno);
 }
 
 ExpressionP CreatePlus(ExpressionP e1,
-                       ExpressionP e2) {
-  return new Plus(e1, e2);
+                       ExpressionP e2,
+                       int lineno) {
+  return new Plus(e1, e2, lineno);
 }
 
 ExpressionP CreateSub(ExpressionP e1,
-                      ExpressionP e2) {
-  return new Sub(e1, e2);
+                      ExpressionP e2,
+                      int lineno) {
+  return new Sub(e1, e2, lineno);
 }
 
 ExpressionP CreateMul(ExpressionP e1,
-                      ExpressionP e2) {
-  return new Mul(e1, e2);
+                      ExpressionP e2,
+                      int lineno) {
+  return new Mul(e1, e2, lineno);
 }
 
 ExpressionP CreateDivide(ExpressionP e1,
-                         ExpressionP e2) {
+                         ExpressionP e2,
+                         int lineno) {
   return new Divide(e1, e2);
 }
 
-ExpressionP CreateNeg(ExpressionP e) {
-  return new Neg(e);
+ExpressionP CreateNeg(ExpressionP e, int lineno) {
+  return new Neg(e, lineno);
 }
 
 ExpressionP CreateLt(ExpressionP e1,
-                     ExpressionP e2) {
-  return new Lt(e1, e2);
+                     ExpressionP e2,
+                     int lineno) {
+  return new Lt(e1, e2, lineno);
 }
 
 ExpressionP CreateEq(ExpressionP e1,
-                     ExpressionP e2) {
+                     ExpressionP e2,
+                     int lineno) {
   return new Eq(e1, e2);
 }
 
 ExpressionP CreateLeq(ExpressionP e1,
-                      ExpressionP e2) {
+                      ExpressionP e2,
+                      int lineno) {
   return new Leq(e1, e2);
 }
 
-ExpressionP CreateComp(ExpressionP e) {
-  return new Comp(e);
+ExpressionP CreateComp(ExpressionP e, int lineno) {
+  return new Comp(e, lineno);
 }
 
-ExpressionP CreateIntConst(SymbolP token) {
-  return new IntConst(token);
+ExpressionP CreateIntConst(SymbolP token, int lineno) {
+  return new IntConst(token, lineno);
 }
 
-ExpressionP CreateBoolConst(bool val) {
-  return new BoolConst(val);
+ExpressionP CreateBoolConst(bool val, int lineno) {
+  return new BoolConst(val, lineno);
 }
 
-ExpressionP CreateStringConst(SymbolP token) {
-  return new StringConst(token);
+ExpressionP CreateStringConst(SymbolP token, int lineno) {
+  return new StringConst(token, lineno);
 }
 
-ExpressionP CreateNew(SymbolP type_name) {
-  return new New(type_name);
+ExpressionP CreateNew(SymbolP type_name, int lineno) {
+  return new New(type_name, lineno);
 }
 
-ExpressionP CreateIsVoid(ExpressionP e) {
-  return new IsVoid(e);
+ExpressionP CreateIsVoid(ExpressionP e, int lineno) {
+  return new IsVoid(e, lineno);
 }
 
-ExpressionP CreateNoExpr() {
-  return new NoExpr();
+ExpressionP CreateNoExpr(int lineno) {
+  return new NoExpr(lineno);
 }
 
-ExpressionP CreateObject(SymbolP name) {
-  return new Object(name);
+ExpressionP CreateObject(SymbolP name, int lineno) {
+  return new Object(name, lineno);
 }
 
 void

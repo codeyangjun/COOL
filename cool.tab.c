@@ -140,6 +140,7 @@ void yyerror(char *s);
 extern int yylex();
 extern char* curr_filename;
 ProgramP ast_root = nullptr;
+extern int yylineno;
 
 int err_cnt = 0;
 
@@ -164,7 +165,7 @@ int err_cnt = 0;
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 18 "cool.y"
+#line 19 "cool.y"
 {
   bool boolean;
   SymbolP symbol;
@@ -182,7 +183,7 @@ typedef union YYSTYPE
   char *error_msg;
 }
 /* Line 193 of yacc.c.  */
-#line 186 "cool.tab.c"
+#line 187 "cool.tab.c"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -207,7 +208,7 @@ typedef struct YYLTYPE
 
 
 /* Line 216 of yacc.c.  */
-#line 211 "cool.tab.c"
+#line 212 "cool.tab.c"
 
 #ifdef short
 # undef short
@@ -523,13 +524,13 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    72,    72,    77,    78,    81,    85,    89,    92,    93,
-      96,    97,   100,   102,   103,   104,   107,   108,   111,   112,
-     115,   119,   120,   122,   123,   126,   127,   130,   131,   136,
-     137,   139,   141,   143,   146,   147,   150,   153,   154,   155,
-     157,   158,   159,   160,   161,   162,   163,   164,   165,   166,
-     167,   168,   169,   170,   171,   172,   173,   174,   175,   176,
-     177,   178
+       0,    73,    73,    78,    79,    82,    87,    91,    94,    95,
+      98,    99,   102,   104,   108,   112,   115,   116,   119,   120,
+     123,   127,   128,   130,   131,   134,   135,   138,   139,   144,
+     146,   148,   150,   152,   155,   156,   159,   165,   169,   173,
+     175,   176,   177,   178,   179,   180,   181,   182,   183,   184,
+     185,   186,   187,   188,   189,   190,   191,   192,   193,   194,
+     195,   196
 };
 #endif
 
@@ -1585,309 +1586,320 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 72 "cool.y"
+#line 73 "cool.y"
     { 
-                        (yyloc) = (yylsp[(1) - (1)]); ast_root = CreateProgram((yyvsp[(1) - (1)].classes));
+                        (yyloc) = (yylsp[(1) - (1)]); ast_root = CreateProgram((yyvsp[(1) - (1)].classes), yylineno);
                      ;}
     break;
 
   case 3:
-#line 77 "cool.y"
+#line 78 "cool.y"
     { (yyval.classes) = CreateSingleClasses((yyvsp[(1) - (1)].class_)); ;}
     break;
 
   case 4:
-#line 78 "cool.y"
+#line 79 "cool.y"
     { (yyval.classes) = AppendClass((yyvsp[(1) - (2)].classes), (yyvsp[(2) - (2)].class_)); ;}
     break;
 
   case 5:
-#line 82 "cool.y"
+#line 83 "cool.y"
     {
-        (yyval.class_) = CreateClass((yyvsp[(2) - (6)].symbol), IdTable.AddString("Object"), StrTable.AddString(curr_filename), (yyvsp[(4) - (6)].features));
+        (yyval.class_) = CreateClass((yyvsp[(2) - (6)].symbol), IdTable.AddString("Object"),
+                         StrTable.AddString(curr_filename), (yyvsp[(4) - (6)].features), yylineno);
       ;}
     break;
 
   case 6:
-#line 86 "cool.y"
+#line 88 "cool.y"
     {
-        (yyval.class_) = CreateClass((yyvsp[(2) - (8)].symbol), (yyvsp[(4) - (8)].symbol), StrTable.AddString(curr_filename), (yyvsp[(6) - (8)].features));
+        (yyval.class_) = CreateClass((yyvsp[(2) - (8)].symbol), (yyvsp[(4) - (8)].symbol), StrTable.AddString(curr_filename), (yyvsp[(6) - (8)].features), yylineno);
       ;}
     break;
 
   case 8:
-#line 92 "cool.y"
+#line 94 "cool.y"
     { (yyval.features) = (yyvsp[(1) - (1)].features); ;}
     break;
 
   case 9:
-#line 93 "cool.y"
+#line 95 "cool.y"
     { (yyval.features) = CreateNilFeatures(); ;}
     break;
 
   case 10:
-#line 96 "cool.y"
+#line 98 "cool.y"
     { (yyval.features) = CreateSingleFeatures((yyvsp[(1) - (2)].feature)); ;}
     break;
 
   case 11:
-#line 97 "cool.y"
+#line 99 "cool.y"
     { (yyval.features) = AppendFeature((yyvsp[(1) - (3)].features), (yyvsp[(2) - (3)].feature)); ;}
     break;
 
   case 12:
-#line 101 "cool.y"
-    { (yyval.feature) = CreateMethod((yyvsp[(1) - (9)].symbol), (yyvsp[(6) - (9)].symbol), (yyvsp[(3) - (9)].formals), (yyvsp[(8) - (9)].expression)); ;}
+#line 103 "cool.y"
+    { (yyval.feature) = CreateMethod((yyvsp[(1) - (9)].symbol), (yyvsp[(6) - (9)].symbol), (yyvsp[(3) - (9)].formals), (yyvsp[(8) - (9)].expression), yylineno); ;}
     break;
 
   case 13:
-#line 102 "cool.y"
-    { (yyval.feature) = CreateAttr((yyvsp[(1) - (3)].symbol), (yyvsp[(3) - (3)].symbol), CreateNoExpr()); ;}
+#line 105 "cool.y"
+    {
+          (yyval.feature) = CreateAttr((yyvsp[(1) - (3)].symbol), (yyvsp[(3) - (3)].symbol), CreateNoExpr(yylineno), yylineno);
+        ;}
     break;
 
   case 14:
-#line 103 "cool.y"
-    { (yyval.feature) = CreateAttr((yyvsp[(1) - (5)].symbol), (yyvsp[(3) - (5)].symbol), (yyvsp[(5) - (5)].expression)); ;}
+#line 109 "cool.y"
+    { 
+          (yyval.feature) = CreateAttr((yyvsp[(1) - (5)].symbol), (yyvsp[(3) - (5)].symbol), (yyvsp[(5) - (5)].expression), yylineno); 
+        ;}
     break;
 
   case 15:
-#line 104 "cool.y"
+#line 112 "cool.y"
     { YYRECOVERING(); ;}
     break;
 
   case 16:
-#line 107 "cool.y"
+#line 115 "cool.y"
     { (yyval.formals) = (yyvsp[(1) - (1)].formals); ;}
     break;
 
   case 17:
-#line 108 "cool.y"
+#line 116 "cool.y"
     { (yyval.formals) = CreateNilFormals(); ;}
     break;
 
   case 18:
-#line 111 "cool.y"
+#line 119 "cool.y"
     { (yyval.formals) = CreateSingleFormals((yyvsp[(1) - (1)].formal)); ;}
     break;
 
   case 19:
-#line 112 "cool.y"
+#line 120 "cool.y"
     { (yyval.formals) = AppendFormal((yyvsp[(1) - (3)].formals), (yyvsp[(3) - (3)].formal)); ;}
     break;
 
   case 20:
-#line 115 "cool.y"
+#line 123 "cool.y"
     { (yyval.formal) = CreateFormal((yyvsp[(1) - (3)].symbol), (yyvsp[(3) - (3)].symbol)); ;}
     break;
 
   case 21:
-#line 119 "cool.y"
+#line 127 "cool.y"
     { (yyval.expressions) = CreateSingleExpressions((yyvsp[(1) - (2)].expression)); ;}
     break;
 
   case 22:
-#line 121 "cool.y"
+#line 129 "cool.y"
     { (yyval.expressions) = AppendExpression((yyvsp[(1) - (3)].expressions), (yyvsp[(2) - (3)].expression)); ;}
     break;
 
   case 23:
-#line 122 "cool.y"
+#line 130 "cool.y"
     { YYRECOVERING(); ;}
     break;
 
   case 24:
-#line 123 "cool.y"
+#line 131 "cool.y"
     { YYRECOVERING(); ;}
     break;
 
   case 25:
-#line 126 "cool.y"
+#line 134 "cool.y"
     { (yyval.expressions) = (yyvsp[(1) - (1)].expressions) ;}
     break;
 
   case 26:
-#line 127 "cool.y"
+#line 135 "cool.y"
     { (yyval.expressions) = CreateNilExpressions(); ;}
     break;
 
   case 27:
-#line 130 "cool.y"
+#line 138 "cool.y"
     { (yyval.expressions) = CreateSingleExpressions((yyvsp[(1) - (1)].expression)); ;}
     break;
 
   case 28:
-#line 132 "cool.y"
+#line 140 "cool.y"
     { (yyval.expressions) = AppendExpression((yyvsp[(1) - (3)].expressions), (yyvsp[(3) - (3)].expression)); ;}
     break;
 
   case 29:
-#line 136 "cool.y"
-    { (yyval.expression) = CreateLet((yyvsp[(1) - (5)].symbol), (yyvsp[(3) - (5)].symbol), CreateNoExpr(), (yyvsp[(5) - (5)].expression)); ;}
+#line 145 "cool.y"
+    { (yyval.expression) = CreateLet((yyvsp[(1) - (5)].symbol), (yyvsp[(3) - (5)].symbol), CreateNoExpr(yylineno),(yyvsp[(5) - (5)].expression), yylineno); ;}
     break;
 
   case 30:
-#line 138 "cool.y"
-    { (yyval.expression) = CreateLet((yyvsp[(1) - (7)].symbol), (yyvsp[(3) - (7)].symbol), (yyvsp[(5) - (7)].expression), (yyvsp[(7) - (7)].expression)); ;}
+#line 147 "cool.y"
+    { (yyval.expression) = CreateLet((yyvsp[(1) - (7)].symbol), (yyvsp[(3) - (7)].symbol), (yyvsp[(5) - (7)].expression), (yyvsp[(7) - (7)].expression), yylineno); ;}
     break;
 
   case 31:
-#line 140 "cool.y"
-    { (yyval.expression) = CreateLet((yyvsp[(1) - (5)].symbol), (yyvsp[(3) - (5)].symbol), CreateNoExpr(), (yyvsp[(5) - (5)].expression)); ;}
+#line 149 "cool.y"
+    { (yyval.expression) = CreateLet((yyvsp[(1) - (5)].symbol), (yyvsp[(3) - (5)].symbol), CreateNoExpr(yylineno), (yyvsp[(5) - (5)].expression)); ;}
     break;
 
   case 32:
-#line 142 "cool.y"
-    { (yyval.expression) = CreateLet((yyvsp[(1) - (7)].symbol), (yyvsp[(3) - (7)].symbol), (yyvsp[(5) - (7)].expression), (yyvsp[(7) - (7)].expression)); ;}
+#line 151 "cool.y"
+    { (yyval.expression) = CreateLet((yyvsp[(1) - (7)].symbol), (yyvsp[(3) - (7)].symbol), (yyvsp[(5) - (7)].expression), (yyvsp[(7) - (7)].expression), yylineno); ;}
     break;
 
   case 33:
-#line 143 "cool.y"
+#line 152 "cool.y"
     { YYRECOVERING(); ;}
     break;
 
   case 34:
-#line 146 "cool.y"
+#line 155 "cool.y"
     { (yyval.cases) = CreateSingleCases((yyvsp[(1) - (1)].case_)); ;}
     break;
 
   case 35:
-#line 147 "cool.y"
+#line 156 "cool.y"
     { (yyval.cases) = AppendCase((yyvsp[(1) - (2)].cases), (yyvsp[(2) - (2)].case_)); ;}
     break;
 
   case 36:
-#line 150 "cool.y"
-    { (yyval.case_) = CreateCase((yyvsp[(1) - (6)].symbol), (yyvsp[(3) - (6)].symbol), (yyvsp[(5) - (6)].expression)); ;}
+#line 160 "cool.y"
+    {
+        (yyval.case_) = CreateCase((yyvsp[(1) - (6)].symbol), (yyvsp[(3) - (6)].symbol), (yyvsp[(5) - (6)].expression), yylineno);
+      ;}
     break;
 
   case 37:
-#line 153 "cool.y"
-    { (yyval.expression) = CreateAssign((yyvsp[(1) - (3)].symbol), (yyvsp[(3) - (3)].expression)); ;}
+#line 166 "cool.y"
+    {
+      (yyval.expression) = CreateAssign((yyvsp[(1) - (3)].symbol), (yyvsp[(3) - (3)].expression), yylineno);
+     ;}
     break;
 
   case 38:
-#line 154 "cool.y"
-    { (yyval.expression) = CreateDispatch((yyvsp[(3) - (6)].symbol), (yyvsp[(1) - (6)].expression), (yyvsp[(5) - (6)].expressions)); ;}
+#line 170 "cool.y"
+    {
+      (yyval.expression) = CreateDispatch((yyvsp[(3) - (6)].symbol), (yyvsp[(1) - (6)].expression), (yyvsp[(5) - (6)].expressions), yylineno);
+     ;}
     break;
 
   case 39:
-#line 156 "cool.y"
-    { (yyval.expression) = CreateStaticDispatch((yyvsp[(5) - (8)].symbol), (yyvsp[(3) - (8)].symbol), (yyvsp[(1) - (8)].expression), (yyvsp[(7) - (8)].expressions)); ;}
+#line 174 "cool.y"
+    { (yyval.expression) = CreateStaticDispatch((yyvsp[(5) - (8)].symbol), (yyvsp[(3) - (8)].symbol), (yyvsp[(1) - (8)].expression), (yyvsp[(7) - (8)].expressions), yylineno); ;}
     break;
 
   case 40:
-#line 157 "cool.y"
-    { (yyval.expression) = CreateCond((yyvsp[(2) - (7)].expression), (yyvsp[(4) - (7)].expression), (yyvsp[(6) - (7)].expression)); ;}
+#line 175 "cool.y"
+    { (yyval.expression) = CreateCond((yyvsp[(2) - (7)].expression), (yyvsp[(4) - (7)].expression), (yyvsp[(6) - (7)].expression), yylineno); ;}
     break;
 
   case 41:
-#line 158 "cool.y"
-    { (yyval.expression) = CreateLoop((yyvsp[(2) - (5)].expression), (yyvsp[(4) - (5)].expression)); ;}
+#line 176 "cool.y"
+    { (yyval.expression) = CreateLoop((yyvsp[(2) - (5)].expression), (yyvsp[(4) - (5)].expression), yylineno); ;}
     break;
 
   case 42:
-#line 159 "cool.y"
-    { (yyval.expression) = CreateBlock((yyvsp[(2) - (3)].expressions)); ;}
+#line 177 "cool.y"
+    { (yyval.expression) = CreateBlock((yyvsp[(2) - (3)].expressions), yylineno); ;}
     break;
 
   case 43:
-#line 160 "cool.y"
+#line 178 "cool.y"
     { YYRECOVERING(); ;}
     break;
 
   case 44:
-#line 161 "cool.y"
+#line 179 "cool.y"
     { (yyval.expression) = (yyvsp[(2) - (2)].expression); ;}
     break;
 
   case 45:
-#line 162 "cool.y"
-    { (yyval.expression) = CreateTypecase((yyvsp[(2) - (5)].expression), (yyvsp[(4) - (5)].cases)); ;}
+#line 180 "cool.y"
+    { (yyval.expression) = CreateTypecase((yyvsp[(2) - (5)].expression), (yyvsp[(4) - (5)].cases), yylineno); ;}
     break;
 
   case 46:
-#line 163 "cool.y"
-    { (yyval.expression) = CreateIsVoid((yyvsp[(2) - (2)].expression)); ;}
+#line 181 "cool.y"
+    { (yyval.expression) = CreateIsVoid((yyvsp[(2) - (2)].expression), yylineno); ;}
     break;
 
   case 47:
-#line 164 "cool.y"
-    { (yyval.expression) = CreateNew((yyvsp[(2) - (2)].symbol)); ;}
+#line 182 "cool.y"
+    { (yyval.expression) = CreateNew((yyvsp[(2) - (2)].symbol), yylineno); ;}
     break;
 
   case 48:
-#line 165 "cool.y"
-    { (yyval.expression) = CreatePlus((yyvsp[(1) - (3)].expression), (yyvsp[(3) - (3)].expression)); ;}
+#line 183 "cool.y"
+    { (yyval.expression) = CreatePlus((yyvsp[(1) - (3)].expression), (yyvsp[(3) - (3)].expression), yylineno); ;}
     break;
 
   case 49:
-#line 166 "cool.y"
-    { (yyval.expression) = CreateSub((yyvsp[(1) - (3)].expression), (yyvsp[(3) - (3)].expression)); ;}
+#line 184 "cool.y"
+    { (yyval.expression) = CreateSub((yyvsp[(1) - (3)].expression), (yyvsp[(3) - (3)].expression), yylineno); ;}
     break;
 
   case 50:
-#line 167 "cool.y"
-    { (yyval.expression) = CreateMul((yyvsp[(1) - (3)].expression), (yyvsp[(3) - (3)].expression)); ;}
+#line 185 "cool.y"
+    { (yyval.expression) = CreateMul((yyvsp[(1) - (3)].expression), (yyvsp[(3) - (3)].expression), yylineno); ;}
     break;
 
   case 51:
-#line 168 "cool.y"
-    { (yyval.expression) = CreateDivide((yyvsp[(1) - (3)].expression), (yyvsp[(3) - (3)].expression)); ;}
+#line 186 "cool.y"
+    { (yyval.expression) = CreateDivide((yyvsp[(1) - (3)].expression), (yyvsp[(3) - (3)].expression), yylineno); ;}
     break;
 
   case 52:
-#line 169 "cool.y"
-    { (yyval.expression) = CreateComp((yyvsp[(2) - (2)].expression)); ;}
+#line 187 "cool.y"
+    { (yyval.expression) = CreateComp((yyvsp[(2) - (2)].expression), yylineno); ;}
     break;
 
   case 53:
-#line 170 "cool.y"
-    { (yyval.expression) = CreateLt((yyvsp[(1) - (3)].expression), (yyvsp[(3) - (3)].expression)); ;}
+#line 188 "cool.y"
+    { (yyval.expression) = CreateLt((yyvsp[(1) - (3)].expression), (yyvsp[(3) - (3)].expression), yylineno); ;}
     break;
 
   case 54:
-#line 171 "cool.y"
-    { (yyval.expression) = CreateLeq((yyvsp[(1) - (3)].expression), (yyvsp[(3) - (3)].expression)); ;}
+#line 189 "cool.y"
+    { (yyval.expression) = CreateLeq((yyvsp[(1) - (3)].expression), (yyvsp[(3) - (3)].expression), yylineno); ;}
     break;
 
   case 55:
-#line 172 "cool.y"
-    { (yyval.expression) = CreateEq((yyvsp[(1) - (3)].expression), (yyvsp[(3) - (3)].expression)); ;}
+#line 190 "cool.y"
+    { (yyval.expression) = CreateEq((yyvsp[(1) - (3)].expression), (yyvsp[(3) - (3)].expression), yylineno); ;}
     break;
 
   case 56:
-#line 173 "cool.y"
-    { (yyval.expression) = CreateNeg((yyvsp[(2) - (2)].expression)); ;}
+#line 191 "cool.y"
+    { (yyval.expression) = CreateNeg((yyvsp[(2) - (2)].expression), yylineno); ;}
     break;
 
   case 57:
-#line 174 "cool.y"
-    { (yyval.expression) = CreateIntConst((yyvsp[(1) - (1)].symbol)); ;}
+#line 192 "cool.y"
+    { (yyval.expression) = CreateIntConst((yyvsp[(1) - (1)].symbol), yylineno); ;}
     break;
 
   case 58:
-#line 175 "cool.y"
-    { (yyval.expression) = CreateStringConst((yyvsp[(1) - (1)].symbol)); ;}
+#line 193 "cool.y"
+    { (yyval.expression) = CreateStringConst((yyvsp[(1) - (1)].symbol), yylineno); ;}
     break;
 
   case 59:
-#line 176 "cool.y"
-    { (yyval.expression) = CreateBoolConst((yyvsp[(1) - (1)].boolean));;}
+#line 194 "cool.y"
+    { (yyval.expression) = CreateBoolConst((yyvsp[(1) - (1)].boolean), yylineno); ;}
     break;
 
   case 60:
-#line 177 "cool.y"
-    { (yyval.expression) = CreateObject((yyvsp[(1) - (1)].symbol)); ;}
+#line 195 "cool.y"
+    { (yyval.expression) = CreateObject((yyvsp[(1) - (1)].symbol), yylineno); ;}
     break;
 
   case 61:
-#line 178 "cool.y"
+#line 196 "cool.y"
     { (yyval.expression) = (yyvsp[(2) - (3)].expression); ;}
     break;
 
 
 /* Line 1267 of yacc.c.  */
-#line 1891 "cool.tab.c"
+#line 1903 "cool.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -2107,7 +2119,7 @@ yyreturn:
 }
 
 
-#line 181 "cool.y"
+#line 199 "cool.y"
 
 
 void yyerror(char *s) {

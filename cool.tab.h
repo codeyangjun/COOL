@@ -100,7 +100,7 @@
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 18 "cool.y"
+#line 19 "cool.y"
 {
   bool boolean;
   SymbolP symbol;

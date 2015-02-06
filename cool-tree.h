@@ -50,7 +50,7 @@ typedef Cases* CasesP;
 class Program : public TreeNode {
  public:
   ClassesP classes;
-  Program(ClassesP cl) : classes(cl) {}
+  Program(ClassesP cl, int lineno = 0) : classes(cl) { line_number_ = lineno; }
   void Dump(std::ostream& stream, int n);
   void DumpWithTypes(std::ostream& stream, int n);
 };
@@ -63,9 +63,9 @@ class Class : public TreeNode {
   FeaturesP features;
   
   Class(SymbolP v_name, SymbolP v_parent, SymbolP v_filename,
-        FeaturesP v_features)
+        FeaturesP v_features, int lineno = 0)
     : name(v_name), parent(v_parent),
-      filename(v_filename), features(v_features) {}
+      filename(v_filename), features(v_features) { line_number_ = lineno; }
 
   void Dump(std::ostream& stream, int n);
   void DumpWithTypes(std::ostream& stream, int n);
@@ -87,9 +87,10 @@ class Method : public Feature {
    Method(SymbolP v_name,
           SymbolP v_return_type,
           FormalsP v_formals,
-          ExpressionP v_expression)
+          ExpressionP v_expression,
+          int lineno = 0)
      : name(v_name), return_type(v_return_type), formals(v_formals),
-       expression(v_expression) {}
+       expression(v_expression) { line_number_ = lineno; }
 
    void Dump(std::ostream& stream, int n);
    void DumpWithTypes(std::ostream& stream, int n);
@@ -103,8 +104,9 @@ class Attr : public Feature {
 
   Attr(SymbolP v_name,
        SymbolP v_type_decl,
-       ExpressionP v_init)
-    : name(v_name), type_decl(v_type_decl), init(v_init) {}
+       ExpressionP v_init,
+       int lineno = 0)
+    : name(v_name), type_decl(v_type_decl), init(v_init) { line_number_ = lineno; }
 
   void Dump(std::ostream& stream, int n);
    void DumpWithTypes(std::ostream& stream, int n);
@@ -114,8 +116,8 @@ class Formal : public TreeNode {
  public:
   SymbolP name;
   SymbolP type_decl;
-  Formal(SymbolP v_name, SymbolP v_type_decl)
-    : name(v_name), type_decl(v_type_decl) {}
+  Formal(SymbolP v_name, SymbolP v_type_decl, int lineno = 0)
+    : name(v_name), type_decl(v_type_decl) { line_number_ = lineno; }
   void Dump(std::ostream& stream, int n);
   void DumpWithTypes(std::ostream& stream, int n);
 };
@@ -128,8 +130,11 @@ class Case : public TreeNode {
 
    Case(SymbolP v_name,
         SymbolP v_type_decl,
-        ExpressionP v_expression)
-     : name(v_name), type_decl(v_type_decl), expression(v_expression) {}
+        ExpressionP v_expression,
+        int lineno = 0)
+     : name(v_name), type_decl(v_type_decl), expression(v_expression) {
+       line_number_ = lineno;
+     }
   
    void Dump(std::ostream& stream, int n );
    void DumpWithTypes(std::ostream& stream, int n);
@@ -145,8 +150,8 @@ class Assign : public Expression {
  public:
   SymbolP name;
   ExpressionP expression;
-  Assign(SymbolP v_name, ExpressionP v_expression)
-    : name(v_name), expression(v_expression) {}
+  Assign(SymbolP v_name, ExpressionP v_expression, int lineno = 0)
+    : name(v_name), expression(v_expression) { line_number_ = lineno; }
   void Dump(std::ostream& stream, int n);
   void DumpWithTypes(std::ostream& stream, int n);
 };
@@ -162,11 +167,12 @@ class StaticDispatch : public Expression {
   StaticDispatch(SymbolP v_name,
                  SymbolP v_type_name,
                  ExpressionP v_expression,
-                 ExpressionsP v_actual_exprs)
+                 ExpressionsP v_actual_exprs,
+                 int lineno = 0)
     : name(v_name),
       type_name(v_type_name),
       expression(v_expression),
-      actual_exprs(v_actual_exprs) {}
+      actual_exprs(v_actual_exprs) { line_number_ = lineno; }
 
   void Dump(std::ostream& stream, int n);
   void DumpWithTypes(std::ostream& stream, int n);
@@ -179,8 +185,11 @@ class Dispatch : public Expression {
   ExpressionsP actual_exprs;
   Dispatch(SymbolP v_name,
            ExpressionP v_expression,
-           ExpressionsP v_actual_exprs)
-    : name(v_name), expression(v_expression), actual_exprs(v_actual_exprs) {}
+           ExpressionsP v_actual_exprs,
+           int lineno = 0)
+    : name(v_name), expression(v_expression), actual_exprs(v_actual_exprs) {
+      line_number_ = lineno;
+    }
   void Dump(std::ostream& stream, int n);
   void DumpWithTypes(std::ostream& stream, int n);
 };
@@ -193,8 +202,11 @@ class Cond : public Expression {
 
    Cond(ExpressionP v_pred,
         ExpressionP v_then_exp,
-        ExpressionP v_else_exp)
-     : pred(v_pred), then_exp(v_then_exp), else_exp(v_else_exp) {}
+        ExpressionP v_else_exp,
+        int lineno = 0)
+     : pred(v_pred), then_exp(v_then_exp), else_exp(v_else_exp) { 
+       line_number_ = lineno; 
+     }
    void Dump(std::ostream& stream, int n);
    void DumpWithTypes(std::ostream& stream, int n);
 };
@@ -205,8 +217,9 @@ class Loop : public Expression {
   ExpressionP body;
   
   Loop(ExpressionP v_pred,
-       ExpressionP v_body)
-    : pred(v_pred), body(v_body) {}
+       ExpressionP v_body,
+       int lineno = 0)
+    : pred(v_pred), body(v_body) { line_number_ = lineno; }
 
   void Dump(std::ostream& stream, int n);
   void DumpWithTypes(std::ostream& stream, int n);
@@ -218,9 +231,10 @@ class Typcase : public Expression {
   CasesP cases;
 
   Typcase(ExpressionP v_expression,
-          CasesP v_cases)
+          CasesP v_cases,
+          int lineno = 0)
     : expression(v_expression),
-      cases(v_cases) {}
+      cases(v_cases) { line_number_ = lineno; }
 
   void Dump(std::ostream& stream, int n);
   void DumpWithTypes(std::ostream& stream, int n);
@@ -229,7 +243,8 @@ class Typcase : public Expression {
 class Block : public Expression {
  public:
   ExpressionsP body;
-  Block(ExpressionsP v_body) : body(v_body) {}
+  Block(ExpressionsP v_body,
+        int lineno) : body(v_body) { line_number_ = lineno; }
   void Dump(std::ostream& stream, int n);
   void DumpWithTypes(std::ostream& stream, int n);
 };
@@ -244,11 +259,12 @@ class Let : public Expression {
   Let(SymbolP v_identifier,
       SymbolP v_type_decl,
       ExpressionP v_init,
-      ExpressionP v_body)
+      ExpressionP v_body,
+      int lineno = 0)
     : identifier(v_identifier),
       type_decl(v_type_decl),
       init(v_init),
-      body(v_body) {}
+      body(v_body) { line_number_ = lineno; }
 
   void Dump(std::ostream& stream, int n);
   void DumpWithTypes(std::ostream& stream, int n);
@@ -259,9 +275,9 @@ class Plus : public Expression {
    ExpressionP e1;
    ExpressionP e2;
    
-   Plus(ExpressionP v_e1, ExpressionP v_e2)
+   Plus(ExpressionP v_e1, ExpressionP v_e2, int lineno = 0)
      : e1(v_e1),
-       e2(v_e2) {}
+       e2(v_e2) { line_number_ = lineno; }
 
   void Dump(std::ostream& stream, int n);
   void DumpWithTypes(std::ostream& stream, int n);
@@ -273,8 +289,9 @@ class Sub : public Expression {
   ExpressionP e2;
 
   Sub(ExpressionP v_e1,
-      ExpressionP v_e2)
-    : e1(v_e1), e2(v_e2) {}
+      ExpressionP v_e2,
+      int lineno = 0)
+    : e1(v_e1), e2(v_e2) { line_number_ = lineno; }
 
   void Dump(std::ostream& stream, int n);
   void DumpWithTypes(std::ostream& stream, int n);
@@ -286,9 +303,10 @@ class Mul : public Expression {
    ExpressionP e2;
 
    Mul(ExpressionP v_e1,
-       ExpressionP v_e2)
+       ExpressionP v_e2,
+       int lineno = 0)
      : e1(v_e1),
-       e2(v_e2) {}
+       e2(v_e2) { line_number_ = lineno; }
 
   void Dump(std::ostream& stream, int n);
   void DumpWithTypes(std::ostream& stream, int n);
@@ -300,9 +318,10 @@ class Divide : public Expression {
    ExpressionP e2;
 
    Divide(ExpressionP v_e1,
-          ExpressionP v_e2)
+          ExpressionP v_e2,
+          int lineno = 0)
      : e1(v_e1),
-       e2(v_e2) {}
+       e2(v_e2) { line_number_ = lineno; }
 
   void Dump(std::ostream& stream, int n);
   void DumpWithTypes(std::ostream& stream, int n);
@@ -312,7 +331,7 @@ class Neg : public Expression {
  public:
    ExpressionP e;
 
-   Neg(ExpressionP v_e) : e(v_e) {}
+   Neg(ExpressionP v_e, int lineno) : e(v_e) { line_number_ = lineno; }
 
   void Dump(std::ostream& stream, int n);
   void DumpWithTypes(std::ostream& stream, int n);
@@ -324,9 +343,10 @@ class Lt : public Expression {
    ExpressionP e2;
 
    Lt(ExpressionP v_e1,
-      ExpressionP v_e2)
+      ExpressionP v_e2,
+      int lineno = 0)
      : e1(v_e1),
-       e2(v_e2) {}
+       e2(v_e2) { line_number_ = lineno; }
 
   void Dump(std::ostream& stream, int n);
   void DumpWithTypes(std::ostream& stream, int n);
@@ -338,9 +358,10 @@ class Eq : public Expression {
    ExpressionP e2;
 
    Eq(ExpressionP v_e1,
-      ExpressionP v_e2)
+      ExpressionP v_e2,
+      int lineno = 0)
      : e1(v_e1),
-       e2(v_e2) {}
+       e2(v_e2) { line_number_ = lineno; }
 
   void Dump(std::ostream& stream, int n);
   void DumpWithTypes(std::ostream& stream, int n);
@@ -352,9 +373,10 @@ class Leq : public Expression {
    ExpressionP e2;
 
    Leq(ExpressionP v_e1,
-       ExpressionP v_e2)
+       ExpressionP v_e2,
+       int lineno = 0)
      : e1(v_e1),
-       e2(v_e2) {}
+       e2(v_e2) { line_number_ = lineno; }
 
   void Dump(std::ostream& stream, int n);
   void DumpWithTypes(std::ostream& stream, int n);
@@ -364,7 +386,7 @@ class Comp : public Expression {
  public:
    ExpressionP e;
 
-   Comp(ExpressionP v_e) : e(v_e) {}
+   Comp(ExpressionP v_e, int lineno = 0) : e(v_e) { line_number_ = lineno; }
 
   void Dump(std::ostream& stream, int n);
   void DumpWithTypes(std::ostream& stream, int n);
@@ -374,7 +396,9 @@ class IntConst : public Expression {
  public:
   SymbolP token;
 
-  IntConst(SymbolP v_token) : token(v_token) {}
+  IntConst(SymbolP v_token, int lineno = 0) : token(v_token) {
+    line_number_ = lineno;
+  }
 
   void Dump(std::ostream& stream, int n);
   void DumpWithTypes(std::ostream& stream, int n);
@@ -384,7 +408,7 @@ class BoolConst : public Expression {
  public:
    bool val;
 
-   BoolConst(bool v_val) : val(v_val) {}
+   BoolConst(bool v_val, int lineno = 0) : val(v_val) { line_number_ = lineno; }
 
   void Dump(std::ostream& stream, int n);
   void DumpWithTypes(std::ostream& stream, int n);
@@ -393,7 +417,9 @@ class BoolConst : public Expression {
 class StringConst : public Expression {
  public:
    SymbolP token;
-   StringConst(SymbolP v_token) : token(v_token) {}
+   StringConst(SymbolP v_token, int lineno = 0) : token(v_token) {
+     line_number_ = lineno; 
+   }
 
   void Dump(std::ostream& stream, int n);
   void DumpWithTypes(std::ostream& stream, int n);
@@ -403,7 +429,9 @@ class New : public Expression {
  public:
    SymbolP type_name;
 
-   New(SymbolP v_type_name) : type_name(v_type_name) {}
+   New(SymbolP v_type_name, int lineno = 0) : type_name(v_type_name) {
+     line_number_ = lineno;
+   }
 
   void Dump(std::ostream& stream, int n);
   void DumpWithTypes(std::ostream& stream, int n);
@@ -412,14 +440,14 @@ class New : public Expression {
 class IsVoid : public Expression {
  public:
    ExpressionP e;
-   IsVoid(ExpressionP v_e) : e(v_e) {}
+   IsVoid(ExpressionP v_e, int lineno) : e(v_e) { line_number_ = lineno; }
    void Dump(std::ostream& stream, int n);
    void DumpWithTypes(std::ostream& stream, int n);
 };
 
 class NoExpr : public Expression {
  public:
-   NoExpr() {}
+   NoExpr(int lineno = 0) { line_number_ = lineno; }
    void Dump(std::ostream& stream, int n);
    void DumpWithTypes(std::ostream& stream, int n);
 };
@@ -427,7 +455,9 @@ class NoExpr : public Expression {
 class Object : public Expression {
  public:
   SymbolP name;
-  Object(SymbolP v_name) : name(v_name) {}
+  Object(SymbolP v_name, int lineno = 0) : name(v_name) { 
+    line_number_ = lineno;
+  }
   void Dump(std::ostream& stream, int n);
   void DumpWithTypes(std::ostream& stream, int n);
 };
@@ -452,95 +482,115 @@ CasesP CreateNilCases();
 CasesP CreateSingleCases(CaseP c);
 CasesP AppendCase(CasesP cs, CaseP c);
 
-ProgramP CreateProgram(ClassesP cs);
+ProgramP CreateProgram(ClassesP cs, int lineno = 0);
 
 ClassP CreateClass(SymbolP name,
                    SymbolP parent,
                    SymbolP filename,
-                   FeaturesP features);
+                   FeaturesP features,
+                   int lineno = 0);
 
 FeatureP CreateMethod(SymbolP name,
                       SymbolP return_type,
                       FormalsP formals,
-                      ExpressionP expression);
+                      ExpressionP expression,
+                      int lineno = 0);
 
 FeatureP CreateAttr(SymbolP name,
                     SymbolP type_decl,
-                    ExpressionP init);
+                    ExpressionP init,
+                    int lineno = 0);
 
 FormalP CreateFormal(SymbolP name,
-                     SymbolP type_decl);
+                     SymbolP type_decl,
+                     int lineno = 0);
 
 CaseP CreateCase(SymbolP name,
                  SymbolP type_decl,
-                 ExpressionP expression);
+                 ExpressionP expression,
+                 int lineno = 0);
 
 ExpressionP CreateAssign(SymbolP name,
-                         ExpressionP expression);
+                         ExpressionP expression,
+                         int lineno = 0);
 
 ExpressionP CreateStaticDispatch(SymbolP name,
                                  SymbolP type_name,
                                  ExpressionP expression,
-                                 ExpressionsP actual_exprs);
+                                 ExpressionsP actual_exprs,
+                                 int lineno = 0);
 
 ExpressionP CreateDispatch(SymbolP name,
                            ExpressionP expression,
-                           ExpressionsP actual_exprs);
+                           ExpressionsP actual_exprs,
+                           int lineno = 0);
 
 ExpressionP CreateCond(ExpressionP pred,
                        ExpressionP then_exp,
-                       ExpressionP else_exp);
+                       ExpressionP else_exp,
+                       int lineno = 0);
 
 ExpressionP CreateLoop(ExpressionP pred,
-                       ExpressionP body);
+                       ExpressionP body,
+                       int lineno = 0);
 
 ExpressionP CreateTypecase(ExpressionP expression,
-                           CasesP cases);
+                           CasesP cases,
+                           int lineno = 0);
 
-ExpressionP CreateBlock(ExpressionsP body);
+ExpressionP CreateBlock(ExpressionsP body,
+                        int lineno = 0);
 
 ExpressionP CreateLet(SymbolP identifier,
                        SymbolP type_decl,
                        ExpressionP init,
-                       ExpressionP body);
+                       ExpressionP body,
+                       int lineno = 0);
 
 ExpressionP CreatePlus(ExpressionP e1,
-                       ExpressionP e2);
+                       ExpressionP e2,
+                       int lineno = 0);
 
 ExpressionP CreateSub(ExpressionP e1,
-                      ExpressionP e2);
+                      ExpressionP e2,
+                      int lineno = 0);
 
 ExpressionP CreateMul(ExpressionP e1,
-                      ExpressionP e2);
+                      ExpressionP e2,
+                      int lineno = 0);
 
 ExpressionP CreateDivide(ExpressionP e1,
-                         ExpressionP e2);
+                         ExpressionP e2,
+                         int lineno = 0);
 
-ExpressionP CreateNeg(ExpressionP e);
+ExpressionP CreateNeg(ExpressionP e, int lineno = 0);
 
 ExpressionP CreateLt(ExpressionP e1,
-                     ExpressionP e2);
+                     ExpressionP e2,
+                     int lineno = 0);
 
 ExpressionP CreateEq(ExpressionP e1,
-                     ExpressionP e2);
+                     ExpressionP e2,
+                     int lineno = 0);
 
 ExpressionP CreateLeq(ExpressionP e1,
-                      ExpressionP e2);
+                      ExpressionP e2,
+                      int lineno = 0);
 
-ExpressionP CreateComp(ExpressionP e);
+ExpressionP CreateComp(ExpressionP e, int lineno = 0);
 
-ExpressionP CreateIntConst(SymbolP token);
+ExpressionP CreateIntConst(SymbolP token, int lineno = 0);
 
-ExpressionP CreateBoolConst(bool val);
+ExpressionP CreateBoolConst(bool val, int lineno = 0);
 
-ExpressionP CreateStringConst(SymbolP token);
+ExpressionP CreateStringConst(SymbolP token, int lineno = 0);
 
-ExpressionP CreateNew(SymbolP type_name);
+ExpressionP CreateNew(SymbolP type_name, int lineno = 0);
 
-ExpressionP CreateIsVoid(ExpressionP e);
+ExpressionP CreateIsVoid(ExpressionP e, int lineno = 0);
 
-ExpressionP CreateNoExpr();
+ExpressionP CreateNoExpr(int lineno = 0);
 
-ExpressionP CreateObject(SymbolP name);
+ExpressionP CreateObject(SymbolP name, int lineno = 0);
 
 #endif

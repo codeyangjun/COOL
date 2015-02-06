@@ -11,6 +11,7 @@ void yyerror(char *s);
 extern int yylex();
 extern char* curr_filename;
 ProgramP ast_root = nullptr;
+extern int yylineno;
 
 int err_cnt = 0;
 %}
@@ -70,7 +71,7 @@ int err_cnt = 0;
 %%
 
 program : class_list { 
-                        @$ = @1; ast_root = CreateProgram($1);
+                        @$ = @1; ast_root = CreateProgram($1, yylineno);
                      }
         ;
 
@@ -80,11 +81,12 @@ class_list : class { $$ = CreateSingleClasses($1); }
 
 class : CLASS TYPEID '{' features_list '}' ';'
       {
-        $$ = CreateClass($2, IdTable.AddString("Object"), StrTable.AddString(curr_filename), $4);
+        $$ = CreateClass($2, IdTable.AddString("Object"),
+                         StrTable.AddString(curr_filename), $4, yylineno);
       }
       | CLASS TYPEID INHERITS TYPEID '{' features_list '}' ';'
       {
-        $$ = CreateClass($2, $4, StrTable.AddString(curr_filename), $6);
+        $$ = CreateClass($2, $4, StrTable.AddString(curr_filename), $6, yylineno);
       }
       | error ';'
       ;
@@ -98,9 +100,15 @@ features : feature ';' { $$ = CreateSingleFeatures($1); }
          ;
 
 feature : OBJECTID '(' formals_list ')' ':' TYPEID '{' expr '}'
-        { $$ = CreateMethod($1, $6, $3, $8); }
-        | OBJECTID ':' TYPEID { $$ = CreateAttr($1, $3, CreateNoExpr()); }
-        | OBJECTID ':' TYPEID ASSIGN expr { $$ = CreateAttr($1, $3, $5); }
+        { $$ = CreateMethod($1, $6, $3, $8, yylineno); }
+        | OBJECTID ':' TYPEID 
+        {
+          $$ = CreateAttr($1, $3, CreateNoExpr(yylineno), yylineno);
+        }
+        | OBJECTID ':' TYPEID ASSIGN expr
+        { 
+          $$ = CreateAttr($1, $3, $5, yylineno); 
+        }
         | error { YYRECOVERING(); }
         ;
 
@@ -133,13 +141,14 @@ comma_sep_exprs : expr { $$ = CreateSingleExpressions($1); }
                 ;
 
 /* recursively transform a let expression to a nested let expression */
-let_expr : OBJECTID ':' TYPEID IN expr { $$ = CreateLet($1, $3, CreateNoExpr(), $5); }
+let_expr : OBJECTID ':' TYPEID IN expr
+         { $$ = CreateLet($1, $3, CreateNoExpr(yylineno),$5, yylineno); }
          | OBJECTID ':' TYPEID ASSIGN expr IN expr
-         { $$ = CreateLet($1, $3, $5, $7); }
+         { $$ = CreateLet($1, $3, $5, $7, yylineno); }
          | OBJECTID ':' TYPEID ',' let_expr
-         { $$ = CreateLet($1, $3, CreateNoExpr(), $5); }
+         { $$ = CreateLet($1, $3, CreateNoExpr(yylineno), $5); }
          | OBJECTID ':' TYPEID ASSIGN expr ',' let_expr
-         { $$ = CreateLet($1, $3, $5, $7); }
+         { $$ = CreateLet($1, $3, $5, $7, yylineno); }
          | error ',' let_expr { YYRECOVERING(); }
          ;
 
@@ -147,34 +156,43 @@ cases : case_ { $$ = CreateSingleCases($1); }
       | cases case_ { $$ = AppendCase($1, $2); }
       ;
 
-case_ : OBJECTID ':' TYPEID DARROW expr ';' { $$ = CreateCase($1, $3, $5); }
+case_ : OBJECTID ':' TYPEID DARROW expr ';'
+      {
+        $$ = CreateCase($1, $3, $5, yylineno);
+      }
       ;
 
-expr : OBJECTID ASSIGN expr { $$ = CreateAssign($1, $3); }
-     | expr '.' OBJECTID '(' parameter_expr ')' { $$ = CreateDispatch($3, $1, $5); }
+expr : OBJECTID ASSIGN expr
+     {
+      $$ = CreateAssign($1, $3, yylineno);
+     }
+     | expr '.' OBJECTID '(' parameter_expr ')'
+     {
+      $$ = CreateDispatch($3, $1, $5, yylineno);
+     }
      | expr '@' TYPEID '.' OBJECTID '(' parameter_expr ')'
-     { $$ = CreateStaticDispatch($5, $3, $1, $7); }
-     | IF expr THEN expr ELSE expr FI { $$ = CreateCond($2, $4, $6); } 
-     | WHILE expr LOOP expr POOL { $$ = CreateLoop($2, $4); }
-     | '{' semicolon_sep_exprs '}' { $$ = CreateBlock($2); }
+     { $$ = CreateStaticDispatch($5, $3, $1, $7, yylineno); }
+     | IF expr THEN expr ELSE expr FI { $$ = CreateCond($2, $4, $6, yylineno); } 
+     | WHILE expr LOOP expr POOL { $$ = CreateLoop($2, $4, yylineno); }
+     | '{' semicolon_sep_exprs '}' { $$ = CreateBlock($2, yylineno); }
      | '{' error '}' { YYRECOVERING(); }
      | LET let_expr { $$ = $2; }
-     | CASE expr OF cases ESAC { $$ = CreateTypecase($2, $4); }
-     | ISVOID expr { $$ = CreateIsVoid($2); }
-     | NEW TYPEID { $$ = CreateNew($2); }
-     | expr '+' expr { $$ = CreatePlus($1, $3); }
-     | expr '-' expr { $$ = CreateSub($1, $3); }
-     | expr '*' expr { $$ = CreateMul($1, $3); }
-     | expr '/' expr { $$ = CreateDivide($1, $3); }
-     | NOT expr { $$ = CreateComp($2); }
-     | expr '<' expr { $$ = CreateLt($1, $3); }
-     | expr LE expr { $$ = CreateLeq($1, $3); }
-     | expr '=' expr { $$ = CreateEq($1, $3); }
-     | '~' expr { $$ = CreateNeg($2); }
-     | INT_CONST { $$ = CreateIntConst($1); }
-     | STR_CONST { $$ = CreateStringConst($1); }
-     | BOOL_CONST { $$ = CreateBoolConst($1);}
-     | OBJECTID { $$ = CreateObject($1); }
+     | CASE expr OF cases ESAC { $$ = CreateTypecase($2, $4, yylineno); }
+     | ISVOID expr { $$ = CreateIsVoid($2, yylineno); }
+     | NEW TYPEID { $$ = CreateNew($2, yylineno); }
+     | expr '+' expr { $$ = CreatePlus($1, $3, yylineno); }
+     | expr '-' expr { $$ = CreateSub($1, $3, yylineno); }
+     | expr '*' expr { $$ = CreateMul($1, $3, yylineno); }
+     | expr '/' expr { $$ = CreateDivide($1, $3, yylineno); }
+     | NOT expr { $$ = CreateComp($2, yylineno); }
+     | expr '<' expr { $$ = CreateLt($1, $3, yylineno); }
+     | expr LE expr { $$ = CreateLeq($1, $3, yylineno); }
+     | expr '=' expr { $$ = CreateEq($1, $3, yylineno); }
+     | '~' expr { $$ = CreateNeg($2, yylineno); }
+     | INT_CONST { $$ = CreateIntConst($1, yylineno); }
+     | STR_CONST { $$ = CreateStringConst($1, yylineno); }
+     | BOOL_CONST { $$ = CreateBoolConst($1, yylineno); }
+     | OBJECTID { $$ = CreateObject($1, yylineno); }
      | '(' expr ')' { $$ = $2; }
      ;
 
