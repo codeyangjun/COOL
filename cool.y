@@ -4,7 +4,6 @@
 #include "cool-tree.h"
 #include "helper.h"
 // #define YYLTYPE int
-
 using namespace std;
 
 void yyerror(char *s);
@@ -68,6 +67,15 @@ int err_cnt = 0;
 %type <formals> formals
 %type <formal> formal
 
+%right ASSIGN
+%right NOT
+%nonassoc LE '<' '='
+%left '+' '-'
+%left '*' '/'
+%left ISVOID
+%left '~'
+%left '@'
+%left '.'
 %%
 
 program : class_list { 
@@ -138,6 +146,7 @@ parameter_expr : comma_sep_exprs { $$ = $1 }
 comma_sep_exprs : expr { $$ = CreateSingleExpressions($1); }
                 | comma_sep_exprs ',' expr
                 { $$ = AppendExpression($1, $3); }
+                /* error */
                 ;
 
 /* recursively transform a let expression to a nested let expression */
@@ -162,24 +171,55 @@ case_ : OBJECTID ':' TYPEID DARROW expr ';'
       }
       ;
 
-expr : OBJECTID ASSIGN expr
+expr : 
+     /* assign expression */
+     OBJECTID ASSIGN expr
      {
-      $$ = CreateAssign($1, $3, yylineno);
+        $$ = CreateAssign($1, $3, yylineno);
      }
+
+     /* dispatch */
      | expr '.' OBJECTID '(' parameter_expr ')'
      {
-      $$ = CreateDispatch($3, $1, $5, yylineno);
+        $$ = CreateDispatch($3, $1, $5, yylineno);
      }
+     | OBJECTID '(' parameter_expr ')'
+     {
+        $$ = CreateDispatch($1,
+                            CreateObject(IdTable.AddString("self")),
+                            $3,
+                            yylineno);
+     }
+
+     /* static dispatch */
      | expr '@' TYPEID '.' OBJECTID '(' parameter_expr ')'
-     { $$ = CreateStaticDispatch($5, $3, $1, $7, yylineno); }
+     { 
+        $$ = CreateStaticDispatch($5, $3, $1, $7, yylineno); 
+     }
+
+     /* condition */
      | IF expr THEN expr ELSE expr FI { $$ = CreateCond($2, $4, $6, yylineno); } 
+
+     /* loop */
      | WHILE expr LOOP expr POOL { $$ = CreateLoop($2, $4, yylineno); }
+      
+     /* expression block */
      | '{' semicolon_sep_exprs '}' { $$ = CreateBlock($2, yylineno); }
      | '{' error '}' { YYRECOVERING(); }
+
+     /* let expression */
      | LET let_expr { $$ = $2; }
+
+     /* case expression */
      | CASE expr OF cases ESAC { $$ = CreateTypecase($2, $4, yylineno); }
+
+     /* isvoid expression */
      | ISVOID expr { $$ = CreateIsVoid($2, yylineno); }
+
+     /* new expression */
      | NEW TYPEID { $$ = CreateNew($2, yylineno); }
+
+     /* arithemtic expressions */
      | expr '+' expr { $$ = CreatePlus($1, $3, yylineno); }
      | expr '-' expr { $$ = CreateSub($1, $3, yylineno); }
      | expr '*' expr { $$ = CreateMul($1, $3, yylineno); }
@@ -189,10 +229,16 @@ expr : OBJECTID ASSIGN expr
      | expr LE expr { $$ = CreateLeq($1, $3, yylineno); }
      | expr '=' expr { $$ = CreateEq($1, $3, yylineno); }
      | '~' expr { $$ = CreateNeg($2, yylineno); }
+
+     /* literals */
      | INT_CONST { $$ = CreateIntConst($1, yylineno); }
      | STR_CONST { $$ = CreateStringConst($1, yylineno); }
      | BOOL_CONST { $$ = CreateBoolConst($1, yylineno); }
+
+     /* literals */
      | OBJECTID { $$ = CreateObject($1, yylineno); }
+
+     /* parenthese */
      | '(' expr ')' { $$ = $2; }
      ;
 
@@ -200,12 +246,50 @@ expr : OBJECTID ASSIGN expr
 
 void yyerror(char *s) {
   extern int curr_lineno;
+  auto dump_token = [&]() {
+    using namespace cool_helper;
+    cerr << TokenToString(yychar);
+    switch (yychar) {
+      case (STR_CONST):
+        cerr << " \"" << ToEscapedString(yylval.symbol->GetString())
+            << "\"" << endl;
+        break;
+
+      case (INT_CONST):
+        cerr << " " << yylval.symbol->GetString() << endl;
+        break;
+      
+      case (BOOL_CONST):
+        cerr << " " << (yylval.boolean ? "true" : "false") << endl;
+        break;
+
+      case (TYPEID):
+      case (OBJECTID):
+        cerr << " " << yylval.symbol->GetString() << endl;
+        break;
+
+      case (ERROR):
+        if (yylval.error_msg[0] == 0) {
+          cerr << " \"\\000\"" << endl;
+        } else {
+          cerr << " \""
+              << ToEscapedString(yylval.error_msg)
+              << "\"" << endl;
+        }
+        break;
+        
+      default:
+        cerr << endl;
+    }
+  };
+
   cerr << "\"" << curr_filename << "\", line " << curr_lineno << ": " \
-       << s << " at or near "
-       << cool_helper::TokenToString(yychar) << endl;
+       << s << " at or near ";
+  dump_token();
   ++err_cnt;
   if (err_cnt > 50) {
     cerr << "More than 50 errors" << endl;
     exit(1);
   }
+  cout << "Exit yyerror" << endl;
 }

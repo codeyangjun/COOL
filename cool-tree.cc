@@ -31,9 +31,7 @@ Dump(ostream& stream, int n) {
   for (auto& p : *formals) {
     p->Dump(stream, n + 2);
   }
-
   return_type->Dump(stream, n + 2);
-
   expression->Dump(stream, n + 2);
 }
 
@@ -42,7 +40,6 @@ Dump(ostream& stream, int n) {
   stream << PadSpace(n) << "attr\n";
   name->Dump(stream, n + 2);
   type_decl->Dump(stream, n + 2);
-  init->Dump(stream, n + 2);
 }
 
 void Formal::
@@ -533,7 +530,7 @@ DumpWithTypes(ostream& stream, int n) {
   DumpLine(stream, n, line_number_);
   stream << PadSpace(n) << "_assign" << endl;
   name->Dump(stream, n + 2);
-  expression->Dump(stream, n + 2);
+  expression->DumpWithTypes(stream, n + 2);
   DumpType(stream, n, type_);
 }
 
@@ -706,7 +703,7 @@ void BoolConst::
 DumpWithTypes(ostream& stream, int n) {
   DumpLine(stream, n, line_number_);
   stream << PadSpace(n) << "_bool" << endl;
-  stream << PadSpace(n+2) << (val ? "true" : "false") << endl;
+  stream << PadSpace(n+2) << (val ? "1" : "0") << endl;
   DumpType(stream, n, type_);
 }
 
@@ -746,5 +743,6 @@ void Object::
 DumpWithTypes(ostream& stream, int n) {
   DumpLine(stream, n, line_number_);
   stream << PadSpace(n) << "_object" << endl;
+  name->Dump(stream, n + 2);
   DumpType(stream, n, type_);
 }

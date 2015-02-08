@@ -17,8 +17,19 @@ cnt=$((0))
 correct_cnt=$((0))
 for infile in $infiles; do
   ./cool-lexer $infile |\
-    awk '{ if (NR != 1) { for (i=2; i<=NF; i++) printf "%s ", $i; printf "\n"; } }' > A
-  awk '{ if (NR != 1) { for (i=2; i<=NF; i++) printf "%s ", $i; printf "\n"; } }' ${infile}.out > B
+    awk '{
+          if (NR != 1) {
+            for (i=2; i<=NF; i++)
+              printf "%s ", $i; printf "\n"; 
+            } 
+         }' > A
+  awk '{
+          if (NR != 1) {
+            for (i=2; i<=NF; i++)
+              printf "%s ", $i;
+            printf "\n"; 
+          } 
+       }' ${infile}.out > B
 
   diff -y --suppress-common-lines A B > diff.out
 
