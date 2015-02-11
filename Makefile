@@ -5,7 +5,7 @@ GTEST_LIBS=-lgtest -lpthread
 FLEX_LIBS=-ll
 ALL=symboltab-test cool-tree-test
 FFLAGS=
-BFLAGS=-d
+BFLAGS=-d --verbose -t --debug -v -g
 
 cool-tree.o: cool-tree.cc cool-tree.h symboltab.h helper.h
 	$(CC) $(CFLAGS) $< -c -o $@

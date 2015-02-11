@@ -8,9 +8,10 @@ extern int yyparse();
 extern ProgramP ast_root;
 extern FILE* yyin;
 extern int err_cnt;
+extern int yydebug;
 int main(int argc, char** argv) {
   cool_helper::Init(&argc, argv);
-
+  yydebug = 0;
   for (int i = 1; i < argc; ++i) {
     curr_filename = argv[i];
     FILE* fin = fopen(curr_filename, "r");
@@ -20,7 +21,6 @@ int main(int argc, char** argv) {
     }
     yyin = fin;
     yyparse();
-    cout << "Exit yyparse with errors:" << err_cnt << endl;
     if (err_cnt > 0) {
 	    cerr << "Compilation halted due to lex and parse errors" << endl;
       exit(1);

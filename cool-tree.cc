@@ -236,6 +236,10 @@ ClassesP CreateSingleClasses(ClassP c) {
 }
 
 ClassesP AppendClass(ClassesP cs, ClassP c) {
+  if (!cs) {
+    if (g_log_cerr) cerr << "AppendClass:NULL" << endl;
+    return NULL;
+  }
   cs->push_back(c);
   return cs;
 }
@@ -249,6 +253,10 @@ FeaturesP CreateSingleFeatures(FeatureP f) {
 }
 
 FeaturesP AppendFeature(FeaturesP fs, FeatureP f) {
+  if (!fs) {
+    if (g_log_cerr) cerr << "AppendFeature:NULL" << endl;
+    return NULL;
+  }
   fs->push_back(f);
   return fs;
 }
@@ -262,6 +270,10 @@ FormalsP CreateSingleFormals(FormalP f) {
 }
 
 FormalsP AppendFormal(FormalsP fs, FormalP f) {
+  if (!fs) {
+    if (g_log_cerr) cerr << "AppendFormal:NULL" << endl;
+    return NULL;
+  }
   fs->push_back(f);
   return fs;
 }
@@ -275,6 +287,10 @@ ExpressionsP CreateSingleExpressions(ExpressionP e) {
 }
 
 ExpressionsP AppendExpression(ExpressionsP es, ExpressionP e) {
+  if (!es) {
+    if (g_log_cerr) cerr << "AppendExpression:NULL" << endl;
+    return NULL;
+  }
   es->push_back(e);
   return es;
 }
@@ -288,6 +304,10 @@ CasesP CreateSingleCases(CaseP c) {
 }
 
 CasesP AppendCase(CasesP cs, CaseP c) {
+  if (!cs) {
+    if (g_log_cerr) cerr << "AppendCase:NULL" << endl;
+    return NULL;
+  }
   cs->push_back(c);
   return cs;
 }
@@ -537,8 +557,10 @@ DumpWithTypes(ostream& stream, int n) {
 void StaticDispatch::
 DumpWithTypes(ostream& stream, int n) {
   DumpLine(stream, n, line_number_);
-  stream << PadSpace(n + 2) << "_static_dispatch" << endl;
+  stream << PadSpace(n) << "_static_dispatch" << endl;
   expression->DumpWithTypes(stream, n + 2);
+  type_name->Dump(stream, n + 2);
+  name->Dump(stream, n + 2);
   stream << PadSpace(n + 2) << "(" << endl;
   for (auto& p : *actual_exprs) {
     p->DumpWithTypes(stream, n + 2);
@@ -728,7 +750,7 @@ void IsVoid::
 DumpWithTypes(ostream& stream, int n) {
   DumpLine(stream, n, line_number_);
   stream << PadSpace(n) << "_isvoid" << endl;
-  e->Dump(stream, n + 2);
+  e->DumpWithTypes(stream, n + 2);
   DumpType(stream, n, type_);
 }
 

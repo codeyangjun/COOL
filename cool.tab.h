@@ -64,7 +64,8 @@
      ASSIGN = 280,
      NOT = 281,
      LE = 282,
-     ERROR = 283
+     ERROR = 283,
+     LET_P = 285
    };
 #endif
 /* Tokens.  */
@@ -94,13 +95,14 @@
 #define NOT 281
 #define LE 282
 #define ERROR 283
+#define LET_P 285
 
 
 
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 18 "cool.y"
+#line 17 "cool.y"
 {
   bool boolean;
   SymbolP symbol;
@@ -118,7 +120,7 @@ typedef union YYSTYPE
   char *error_msg;
 }
 /* Line 1529 of yacc.c.  */
-#line 122 "cool.tab.h"
+#line 124 "cool.tab.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1

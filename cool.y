@@ -11,7 +11,6 @@ extern int yylex();
 extern char* curr_filename;
 ProgramP ast_root = nullptr;
 extern int yylineno;
-
 int err_cnt = 0;
 %}
 
@@ -67,6 +66,7 @@ int err_cnt = 0;
 %type <formals> formals
 %type <formal> formal
 
+%right LET_P
 %right ASSIGN
 %right NOT
 %nonassoc LE '<' '='
@@ -76,11 +76,13 @@ int err_cnt = 0;
 %left '~'
 %left '@'
 %left '.'
+
 %%
 
-program : class_list { 
-                        @$ = @1; ast_root = CreateProgram($1, yylineno);
-                     }
+program : class_list
+        { 
+          @$ = @1; ast_root = CreateProgram($1, yylineno);
+        }
         ;
 
 class_list : class { $$ = CreateSingleClasses($1); }
@@ -96,7 +98,7 @@ class : CLASS TYPEID '{' features_list '}' ';'
       {
         $$ = CreateClass($2, $4, StrTable.AddString(curr_filename), $6, yylineno);
       }
-      | error ';'
+      | error ';' { $$ = NULL; }
       ;
 
 features_list : features { $$ = $1; }
@@ -105,6 +107,8 @@ features_list : features { $$ = $1; }
 
 features : feature ';' { $$ = CreateSingleFeatures($1); }
          | features feature ';' { $$ = AppendFeature($1, $2); }
+         | features error ';' { $$ = $1; }
+         | error ';' {  $$ = NULL; }
          ;
 
 feature : OBJECTID '(' formals_list ')' ':' TYPEID '{' expr '}'
@@ -117,7 +121,7 @@ feature : OBJECTID '(' formals_list ')' ':' TYPEID '{' expr '}'
         { 
           $$ = CreateAttr($1, $3, $5, yylineno); 
         }
-        | error { YYRECOVERING(); }
+        error { $$ = NULL; }
         ;
 
 formals_list : formals { $$ = $1; }
@@ -126,17 +130,23 @@ formals_list : formals { $$ = $1; }
 
 formals : formal { $$ = CreateSingleFormals($1); }
         | formals ',' formal { $$ = AppendFormal($1, $3); }
+        | formals ',' error { $$ = $1; }
         ;
 
 formal : OBJECTID ':' TYPEID { $$ = CreateFormal($1, $3); }
        ;
 
 
-semicolon_sep_exprs : expr ';' { $$ = CreateSingleExpressions($1); }
+semicolon_sep_exprs : expr ';'
+                    { 
+                      $$ = CreateSingleExpressions($1); 
+                    }
                     | semicolon_sep_exprs expr ';'
-                    { $$ = AppendExpression($1, $2); }
-                    | semicolon_sep_exprs error ';' { YYRECOVERING(); }
-                    | error ';' { YYRECOVERING(); }
+                    { 
+                      $$ = AppendExpression($1, $2); 
+                    }
+                    | semicolon_sep_exprs error ';' { $$ = NULL; }
+                    | error ';' { $$ = NULL; }
                     ;
 
 parameter_expr : comma_sep_exprs { $$ = $1 }
@@ -146,19 +156,25 @@ parameter_expr : comma_sep_exprs { $$ = $1 }
 comma_sep_exprs : expr { $$ = CreateSingleExpressions($1); }
                 | comma_sep_exprs ',' expr
                 { $$ = AppendExpression($1, $3); }
-                /* error */
+                | comma_sep_exprs ',' error {
+                  $$ = $1;
+                }
+                | error {
+                  $$ = NULL;
+                }
                 ;
 
 /* recursively transform a let expression to a nested let expression */
-let_expr : OBJECTID ':' TYPEID IN expr
+let_expr : OBJECTID ':' TYPEID IN expr %prec LET_P
          { $$ = CreateLet($1, $3, CreateNoExpr(yylineno),$5, yylineno); }
-         | OBJECTID ':' TYPEID ASSIGN expr IN expr
+         | OBJECTID ':' TYPEID ASSIGN expr IN expr %prec LET_P
          { $$ = CreateLet($1, $3, $5, $7, yylineno); }
          | OBJECTID ':' TYPEID ',' let_expr
          { $$ = CreateLet($1, $3, CreateNoExpr(yylineno), $5); }
          | OBJECTID ':' TYPEID ASSIGN expr ',' let_expr
          { $$ = CreateLet($1, $3, $5, $7, yylineno); }
-         | error ',' let_expr { YYRECOVERING(); }
+         | error IN expr %prec LET_P { $$ = NULL; }
+         | error ',' let_expr { $$ = NULL; }
          ;
 
 cases : case_ { $$ = CreateSingleCases($1); }
@@ -205,7 +221,10 @@ expr :
       
      /* expression block */
      | '{' semicolon_sep_exprs '}' { $$ = CreateBlock($2, yylineno); }
-     | '{' error '}' { YYRECOVERING(); }
+     | '{' error '}'
+     { 
+        $$ = NULL;
+     }
 
      /* let expression */
      | LET let_expr { $$ = $2; }
@@ -240,6 +259,7 @@ expr :
 
      /* parenthese */
      | '(' expr ')' { $$ = $2; }
+
      ;
 
 %%
@@ -256,7 +276,7 @@ void yyerror(char *s) {
         break;
 
       case (INT_CONST):
-        cerr << " " << yylval.symbol->GetString() << endl;
+        cerr << " = " << yylval.symbol->GetString() << endl;
         break;
       
       case (BOOL_CONST):
@@ -265,7 +285,7 @@ void yyerror(char *s) {
 
       case (TYPEID):
       case (OBJECTID):
-        cerr << " " << yylval.symbol->GetString() << endl;
+        cerr << " = " << yylval.symbol->GetString() << endl;
         break;
 
       case (ERROR):
@@ -291,5 +311,4 @@ void yyerror(char *s) {
     cerr << "More than 50 errors" << endl;
     exit(1);
   }
-  cout << "Exit yyerror" << endl;
 }
