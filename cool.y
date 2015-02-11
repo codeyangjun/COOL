@@ -113,6 +113,7 @@ features : feature ';' { $$ = CreateSingleFeatures($1); }
 
 feature : OBJECTID '(' formals_list ')' ':' TYPEID '{' expr '}'
         { $$ = CreateMethod($1, $6, $3, $8, yylineno); }
+        | OBJECTID '(' formals_list ')' ':' TYPEID '{' error '}' { $$= NULL; }
         | OBJECTID ':' TYPEID 
         {
           $$ = CreateAttr($1, $3, CreateNoExpr(yylineno), yylineno);
@@ -121,7 +122,6 @@ feature : OBJECTID '(' formals_list ')' ':' TYPEID '{' expr '}'
         { 
           $$ = CreateAttr($1, $3, $5, yylineno); 
         }
-        error { $$ = NULL; }
         ;
 
 formals_list : formals { $$ = $1; }
@@ -130,7 +130,7 @@ formals_list : formals { $$ = $1; }
 
 formals : formal { $$ = CreateSingleFormals($1); }
         | formals ',' formal { $$ = AppendFormal($1, $3); }
-        | formals ',' error { $$ = $1; }
+        | error { $$ = NULL; }
         ;
 
 formal : OBJECTID ':' TYPEID { $$ = CreateFormal($1, $3); }
@@ -146,7 +146,6 @@ semicolon_sep_exprs : expr ';'
                       $$ = AppendExpression($1, $2); 
                     }
                     | semicolon_sep_exprs error ';' { $$ = NULL; }
-                    | error ';' { $$ = NULL; }
                     ;
 
 parameter_expr : comma_sep_exprs { $$ = $1 }
@@ -156,12 +155,6 @@ parameter_expr : comma_sep_exprs { $$ = $1 }
 comma_sep_exprs : expr { $$ = CreateSingleExpressions($1); }
                 | comma_sep_exprs ',' expr
                 { $$ = AppendExpression($1, $3); }
-                | comma_sep_exprs ',' error {
-                  $$ = $1;
-                }
-                | error {
-                  $$ = NULL;
-                }
                 ;
 
 /* recursively transform a let expression to a nested let expression */
@@ -215,6 +208,7 @@ expr :
 
      /* condition */
      | IF expr THEN expr ELSE expr FI { $$ = CreateCond($2, $4, $6, yylineno); } 
+     | IF expr THEN expr error FI { $$ = NULL; }
 
      /* loop */
      | WHILE expr LOOP expr POOL { $$ = CreateLoop($2, $4, yylineno); }
