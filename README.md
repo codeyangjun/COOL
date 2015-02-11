@@ -9,7 +9,12 @@ In this repo, I wrote a compiler for COOL from scratch with reference to 4 PAs I
 
 #### Lexer (OK)
 
-#### Parser (ING)
+#### Parser (OK)
+
+```
+Output of test cases badexprlist.test, badfeatures.test, casenoexpr.test
+from my parser are somewhat diffrent from the reference one.
+```
 
 #### Semantic Checker
 
