@@ -92,4 +92,31 @@ ClassesP CreateBasicClasses() {
                   CreateAttr(val, prim_slot, CreateNoExpr())
                 )
                );
+
+  ClassP Str_class =
+    CreateClass(
+        Str,
+        Object,
+        basic_fn,
+        AppendFeature(
+          AppendFeature(
+            AppendFeature(
+              AppendFeature(
+                CreateSingleFeatures(CreateAttr(val, Int, CreateNoExpr())),
+                CreateAttr(str_field, prim_slot, CreateNoExpr())),
+              CreateMethod(length, Int, CreateNilFormals(), CreateNoExpr())
+            ),
+           CreateMethod(concat,
+                        Str,
+                        CreateSingleFormals(CreateFormal(arg, Str)),
+                        CreateNoExpr())
+          ),
+          CreateMethod(
+                substr,
+                Str,
+                AppendFormal(CreateSingleFormals(CreateFormal(arg, Int)),
+                             CreateFormal(arg2, Int)),
+                CreateNoExpr())
+        )
+      );
 }
