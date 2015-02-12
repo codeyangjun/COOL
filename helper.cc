@@ -6,6 +6,7 @@
 #include <unistd.h>
 using namespace std;
 
+extern int yydebug;
 extern int yy_flex_debug;     // flex : prints recognized rules
 
 namespace cool_helper {
@@ -14,11 +15,12 @@ int g_log_cerr = 0;
 void Init(int* argc, char *argv[]) {
   const std::string help_msg = R"(
   usage:
-    [-hlg] input-files
+    [-hlpg] input-files
 
   options:
     -h    print this messages
     -l    set yy_flex_debug = 1, prints recognized rules
+    -p    set yydebug = 1, prints parser state
     -g    set g_log_cerr = 1
 )";
 
@@ -27,11 +29,14 @@ void Init(int* argc, char *argv[]) {
     exit(0);
   };
 
+  // init all flags
   yy_flex_debug = 0;
+  yydebug = 0;
   g_log_cerr = 0;
   
+  // get flag 
   char c;
-  while ((c = getopt(*argc, argv, "hlg")) != -1) {
+  while ((c = getopt(*argc, argv, "hlpg")) != -1) {
     switch (c) {
       case 'h':
         print_help_msg();
@@ -42,6 +47,10 @@ void Init(int* argc, char *argv[]) {
 
       case 'g':
         g_log_cerr = 1;
+        break;
+
+      case 'p':
+        yydebug = 1;
         break;
 
       default:

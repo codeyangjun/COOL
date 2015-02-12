@@ -4,8 +4,7 @@
 #include "cool-tree.h"
 #include "helper.h"
 // #define YYLTYPE int
-using namespace std;
-
+using namespace std; 
 void yyerror(char *s);
 extern int yylex();
 extern char* curr_filename;
@@ -148,7 +147,7 @@ semicolon_sep_exprs : expr ';'
                     | semicolon_sep_exprs error ';' { $$ = NULL; }
                     ;
 
-parameter_expr : comma_sep_exprs { $$ = $1 }
+parameter_expr : comma_sep_exprs { $$ = $1; }
                | { $$ = CreateNilExpressions(); }
                ;
 
