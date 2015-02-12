@@ -43,5 +43,8 @@ cool.tab.o: cool.tab.c cool.tab.h cool-tree.h symboltab.h
 cool-parser: parser-test.o cool.tab.o lex.yy.o symboltab.o cool-tree.o helper.o
 	$(CC) $(CFLAGS) $(FLEX_LIBS) $^ -o $@
 
+inheritance-tree.o: inheritance-tree.cc inheritance-tree.h helper.h cool-tree.h symboltab.h
+	$(CC) $(CFLAGS) $< -c -o $@
+
 clean:
 	rm *.o

@@ -2,6 +2,10 @@
 #define __HELPER_H__
 #include <string>
 #include <iostream>
+#include <vector>
+#include <map>
+#include <unordered_map>
+#include <set>
 #include "cool-tree.h"
 #include "cool.tab.h"
 
@@ -16,4 +20,8 @@ void Init(int* argc, char *argv[]);
 const char* PadSpace(int n);
 } // namespace cool_helper
 
+// common use type defined
+typedef std::vector<std::string> TypeSignature; // contains a vector of type
+typedef std::unordered_map<std::string, TypeSignature> MethodTypeSigTable; // a table maps method name to (arg1_type, arg2_type, ..., return_type)
+typedef std::unordered_map<std::string, TypeSignature> AttrTypeSigTable; // a table maps attr name to attr_type
 #endif
