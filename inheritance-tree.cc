@@ -1,7 +1,8 @@
 #include "inheritance-tree.h"
 #include "symboltab.h"
-using namespace std;
+#include <memory>
 
+using namespace std;
 
 InheritanceTree::InheritanceTree(ProgramP ast_root)
   : user_classes_(ast_root->classes) {
@@ -23,17 +24,18 @@ InheritanceTree::CreateTree() {
   // create link in basic classes node
   for (auto p : *basic_classes_) {
     const auto& class_name = p->name->GetString();
-    const auto& parent_name = p->name->GetString();
+    const auto& parent_name = p->parent->GetString();
     if (class_name == "Object") {
       continue;
     }
 
     if (!nodes_tab_.count(class_name)) {
-      cerr << "nodes_tab_ cannot find " << class_name << endl;
+      cerr << "create link in basic classes node" << endl;
+      cerr << "nodes_tab_ cannot find class_name " << class_name << endl;
       exit(1);
     }
     if (!nodes_tab_.count(parent_name)) {
-      cerr << "nodes_tab_ cannot find " << parent_name << endl;
+      cerr << "nodes_tab_ cannot find parent_name " << parent_name << endl;
       exit(1);
     }
 
@@ -45,6 +47,7 @@ InheritanceTree::CreateTree() {
   }
 
   if (!nodes_tab_.count("Object")) {
+    cerr << "Set Root" << endl;
     cerr << "nodes_tab_ cannot find Object" << endl;
     exit(1);
   }
@@ -107,12 +110,14 @@ InheritanceTree::CreateTree() {
    
     // create link
     if (!nodes_tab_.count(parent_name)) {
-      cerr << "nodes_tab_ cannot find " << parent_name << endl;
+      cerr << "Create Link in user_classes" << endl;
+      cerr << "nodes_tab_ cannot find parent_name " << parent_name << endl;
       exit(1);
     }
 
     if (!nodes_tab_.count(curr_name)) {
-      cerr << "nodes_tab_ cannot find " << curr_name << endl;
+      cerr << "Create Link in user_classes" << endl;
+      cerr << "nodes_tab_ cannot find curr_name" << curr_name << endl;
       exit(1);
     }
     
@@ -124,6 +129,21 @@ InheritanceTree::CreateTree() {
     cout << curr_name << "<-" << parent_name << endl;
   }
 
+  LoopDetector loop_detector;  
+  if (loop_detector(nodes_tab_)) {
+    for (auto s : loop_detector.GetLoopNodes()) {
+      if (!nodes_tab_.count(s)) {
+        cerr << "Found Loop:" << endl;
+        cerr << "nodes_tab_ cannot find " << s << endl;
+        exit(1);
+      }
+      Node* node = nodes_tab_[s];
+      semant_error->Dump(node->ast_node_->filename, node->ast_node_)
+        << "Class " << s << ", or an ancestor of " << s
+        << ", is involved in an inheritance cycle." << endl;
+    }
+    semant_error->Abort();
+  }
 }
 
 void
@@ -248,6 +268,40 @@ InheritanceTree::InitBasicClasses() {
 }
 
 bool LoopDetector::
-operator()(InheritanceTree::NodeTable& nodes, StrSet& loop_nodes) {
-  ;
+RecursiveHelper(typename InheritanceTree::Node* node,
+                StrSet& loop_nodes) {
+  bool ret = false;  
+  visited_[node->name] = true;
+  instack_[node->name] = true;
+  for (auto ch : node->children) {
+    if (visited_.count(ch->name) && !visited_[ch->name]) {
+      ret |= RecursiveHelper(ch, loop_nodes);
+    }
+    // found loop
+    if (instack_.count(ch->name) && instack_[ch->name]) {
+      for (auto it : instack_) {
+        if (it.second) {
+          loop_nodes.insert(it.first);
+        }
+      }
+      ret |= true;
+    }
+  }
+  instack_[node->name] = false;
+  return ret;
+}
+
+bool LoopDetector::
+operator()(InheritanceTree::NodeTable& nodes) {
+  bool ret = false;
+  loop_nodes_.clear();
+  instack_.clear();
+  visited_.clear();
+  for (auto p : nodes) {
+    if (visited_.count(p.first) && visited_[p.first]) {
+      continue;
+    }
+    ret |= RecursiveHelper(p.second, loop_nodes_);
+  }
+  return ret;
 }

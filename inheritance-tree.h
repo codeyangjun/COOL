@@ -46,12 +46,16 @@ class LoopDetector {
   bool RecursiveHelper(typename InheritanceTree::Node* node,
                        StrSet& loop_nodes);
 
-  bool operator()(typename InheritanceTree::NodeTable& nodes,
-                  StrSet& loop_nodes);
+  bool operator()(typename InheritanceTree::NodeTable& nodes);
+
+  const StrSet& GetLoopNodes() const {
+    return loop_nodes_;
+  }
 
  private:
   std::unordered_map<std::string, bool> instack_;
   std::unordered_map<std::string, bool> visited_;
+  StrSet loop_nodes_;
 };
 
 #endif
