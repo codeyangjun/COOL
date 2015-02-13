@@ -46,5 +46,11 @@ cool-parser: parser-test.o cool.tab.o lex.yy.o symboltab.o cool-tree.o helper.o
 inheritance-tree.o: inheritance-tree.cc inheritance-tree.h helper.h cool-tree.h symboltab.h
 	$(CC) $(CFLAGS) $< -c -o $@
 
+semantic-test.o: semantic-test.cc inheritance-tree.h cool-tree.h helper.h
+	$(CC) $(CFLAGS) $< -c -o $@
+
+cool-semant: semantic-test.o inheritance-tree.o cool.tab.o lex.yy.o symboltab.o cool-tree.o helper.o
+	$(CC) $(CFLAGS) $(FLEX_LIBS) $^ -o $@
+
 clean:
 	rm *.o

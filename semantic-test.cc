@@ -1,6 +1,7 @@
 #include <iostream>
 #include "cool-tree.h"
 #include "helper.h"
+#include "inheritance-tree.h"
 using namespace std;
 int curr_lineno = 1;
 char* curr_filename;
@@ -25,6 +26,7 @@ int main(int argc, char** argv) {
     }
     ast_root->DumpWithTypes(cout, 0);
   }
-
+  
+  auto tree = new InheritanceTree(ast_root);
   return 0;
 }

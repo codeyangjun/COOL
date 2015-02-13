@@ -9,6 +9,8 @@ using namespace std;
 extern int yydebug;
 extern int yy_flex_debug;     // flex : prints recognized rules
 
+SemantError* SemantError::serror_ = nullptr;
+
 namespace cool_helper {
 int g_log_cerr = 0;
 
