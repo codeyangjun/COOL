@@ -246,3 +246,8 @@ InheritanceTree::InitBasicClasses() {
   basic_classes_ = AppendClass(basic_classes_, Bool_class);
   basic_classes_ = AppendClass(basic_classes_, Str_class);
 }
+
+bool LoopDetector::
+operator()(InheritanceTree::NodeTable& nodes, StrSet& loop_nodes) {
+  ;
+}

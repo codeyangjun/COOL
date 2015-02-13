@@ -40,4 +40,18 @@ class InheritanceTree {
   void CreateTree();
   void InitBasicClasses();
 };
+
+class LoopDetector {
+ public:
+  bool RecursiveHelper(typename InheritanceTree::Node* node,
+                       StrSet& loop_nodes);
+
+  bool operator()(typename InheritanceTree::NodeTable& nodes,
+                  StrSet& loop_nodes);
+
+ private:
+  std::unordered_map<std::string, bool> instack_;
+  std::unordered_map<std::string, bool> visited_;
+};
+
 #endif
