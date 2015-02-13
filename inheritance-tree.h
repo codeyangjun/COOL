@@ -30,15 +30,23 @@ class InheritanceTree {
   StrSet basic_classes_str_set_;
   StrSet user_classes_str_set_;
   StrSet classes_str_set_;
+
  public:
   InheritanceTree(ProgramP ast_root);
   ~InheritanceTree();
   Node* GetRoot() { return root_; }
 
+  const TypeSignature* LookupAttrTypeInfo(const std::string& class_name,
+                                          const std::string& attr_name) const;
+
+  const TypeSignature* LookupMethodInfo(const std::string& class_name,
+                                        const std::string& method_name) const;
+
  private:
   ClassesP CreateBasicClasses();
   void CreateTree();
   void InitBasicClasses();
+  void CreateMethodAndAttrTypeInfoTab(Node* node);
 };
 
 class LoopDetector {

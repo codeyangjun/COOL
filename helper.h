@@ -35,7 +35,7 @@ class SemantError {
     return error_stream_;
   }
 
-  std::ostream& dump(ClassP c) {
+  std::ostream& Dump(ClassP c) {
     semant_errors_++;
     return Dump(c->filename, c);
   }
@@ -44,9 +44,7 @@ class SemantError {
     error_stream_ << filename->GetString() << ":" << c->GetLine() << ": ";
     return Dump();
   }
-
-  void Abort() {
-    error_stream_ << "Compilation halted due to static semantic errors."
+void Abort() { error_stream_ << "Compilation halted due to static semantic errors."
                   << std::endl;
     exit(1);
   }
@@ -66,10 +64,15 @@ class SemantError {
   static SemantError* serror_;
 };
 
-
 // common use type defined
 typedef std::vector<std::string> TypeSignature; // contains a vector of type
 typedef std::unordered_map<std::string, TypeSignature> MethodTypeSigTable; // a table maps method name to (arg1_type, arg2_type, ..., return_type)
 typedef std::unordered_map<std::string, TypeSignature> AttrTypeSigTable; // a table maps attr name to attr_type
 typedef std::unordered_set<std::string> StrSet;
+
+// template
+template<typename B, typename S>
+bool IsSubClass(B* baseP) {
+ return nullptr != dynamic_cast<S*>(baseP);
+}
 #endif

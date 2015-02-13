@@ -8,6 +8,7 @@ InheritanceTree::InheritanceTree(ProgramP ast_root)
   : user_classes_(ast_root->classes) {
   InitBasicClasses();
   CreateTree();
+  CreateMethodAndAttrTypeInfoTab(root_);
 }
 
 void
@@ -304,4 +305,28 @@ operator()(InheritanceTree::NodeTable& nodes) {
     ret |= RecursiveHelper(p.second, loop_nodes_);
   }
   return ret;
+}
+
+const TypeSignature*
+InheritanceTree::LookupAttrTypeInfo(const std::string& class_name,
+                                    const std::string& attr_name) const {
+}
+
+const TypeSignature*
+InheritanceTree::LookupMethodTypeInfo(const std::string& class_name,
+                                      const std::string& method_name) const {
+  ;
+}
+
+void 
+InheritanceTree::CreateMethodAndAttrTypeInfoTab(Node* node) {
+  if (node == nullptr) {
+    return;
+  }
+  ClassP curr_class = node->ast_node_;
+  for (auto feature : *(curr_class->features)) {
+    if (IsSubClass<Feature, Method>(feature)) {
+      ;
+    }
+  }
 }
