@@ -9,6 +9,10 @@ InheritanceTree::InheritanceTree(ProgramP ast_root)
   InitBasicClasses();
   CreateTree();
   CreateMethodAndAttrTypeInfoTab(root_);
+  DumpNodeTypeInfo(cerr);
+  CreateAncestorTable(root_);
+  CheckRedefinedInheritedAttr(root_);
+  CheckRedefinedInheritedMethod(root_);
 }
 
 void
@@ -307,26 +311,246 @@ operator()(InheritanceTree::NodeTable& nodes) {
   return ret;
 }
 
-const TypeSignature*
-InheritanceTree::LookupAttrTypeInfo(const std::string& class_name,
-                                    const std::string& attr_name) const {
-}
-
-const TypeSignature*
-InheritanceTree::LookupMethodTypeInfo(const std::string& class_name,
-                                      const std::string& method_name) const {
-  ;
-}
-
 void 
 InheritanceTree::CreateMethodAndAttrTypeInfoTab(Node* node) {
   if (node == nullptr) {
     return;
   }
+  auto semant_error = SemantError::GetInstance(cerr);
   ClassP curr_class = node->ast_node_;
   for (auto feature : *(curr_class->features)) {
     if (IsSubClass<Feature, Method>(feature)) {
-      ;
+      auto method = (MethodP)feature;
+      const auto& method_name = method->name->GetString();
+      TypeSignature sig;
+      // add method args type
+      for (auto formal : *(method->formals)) {
+        if (formal->name->GetString() == "self") {
+          semant_error->Dump(curr_class->filename, curr_class)
+            << "\'self\' cannot be the name of a formal paramter." << endl;
+          continue;
+        }
+        if (formal->type_decl->GetString() == "SELF_TYPE") {
+          semant_error->Dump(curr_class->filename, curr_class)
+            << "Formal parameter " << formal->name->GetString()
+            << " cannot have type SELF_TYPE" << endl;
+        }
+        sig.push_back(formal->type_decl->GetString());
+      }
+      // add method return type info
+      sig.push_back(method->return_type->GetString());
+      if (node->method_type_tab.count(method_name)) {
+        semant_error->Dump(curr_class->filename, curr_class)
+            << "Method " << method_name << " is multiple defined." << endl;
+          // only store the first defined method
+          continue;
+      }
+      node->method_type_tab[method_name].swap(sig);
+    } else if (IsSubClass<Feature, Attr>(feature)) {
+      auto attr = (AttrP)feature;
+      const auto& attr_name = attr->name->GetString();
+      if (attr_name == "self") {
+        semant_error->Dump(curr_class->filename, curr_class)
+            << "\'self\' cannot be the name of a attribute." << endl;
+          continue;
+      }
+      if (node->attr_type_tab.count(attr_name)) {
+        semant_error->Dump(curr_class->filename, curr_class)
+          << "Attribute " << attr_name << " is multiple defined." << endl;
+        // only store the first defined attribute
+        continue;
+      }
+      TypeSignature sig;
+      sig.push_back(attr->type_decl->GetString());
+      node->attr_type_tab[attr_name].swap(sig);
+    } else {
+      cerr << "CreateMethodAndAttrTypeInfoTab: Unkonw Subclass." << endl;
+      exit(1);
     }
+  }
+
+  for (auto ch : node->children) {
+    CreateMethodAndAttrTypeInfoTab(ch);
+  }
+}
+
+void InheritanceTree::Node::
+DumpMethodTypeTab(ostream& stream) {
+  for (const auto it : method_type_tab) {
+    stream << " " << it.first << "(";
+    const auto& sig = it.second;
+    int i = 0;
+    for (i = 0; i < sig.size() - 1; ++i) {
+      stream << sig[i];
+      if (i == sig.size() - 2) {
+        continue;
+      }
+      cout << ",";
+    }
+    cout << ")" << ":" << sig[i] << endl;
+  }
+}
+
+void InheritanceTree::Node::
+DumpAttrTypeTab(ostream& stream) {
+  for (const auto it : attr_type_tab) {
+    const auto& sig = it.second;
+    cout << "   " << it.first << ":" << sig[0] << endl;
+  }
+}
+
+void InheritanceTree::
+DumpNodeTypeInfo(ostream& stream) {
+  for (auto it : nodes_tab_) {
+    stream << "Class "<< it.first << " {" << endl;
+    it.second->DumpMethodTypeTab(stream);
+    it.second->DumpAttrTypeTab(stream);
+    stream << "}" << endl;
+  }
+}
+
+void InheritanceTree::
+CreateAncestorTable(Node* node) {
+  static vector<string> st;
+  vector<string> ancestors(st.rbegin(), st.rend());
+  ancestor_tab_[node->name].swap(ancestors);
+  st.push_back(node->name);
+  for (auto ch : node->children) {
+    CreateAncestorTable(ch);
+  }
+  st.pop_back();
+}
+
+// check whether current class defined an attribute already defined in its
+// super class
+void InheritanceTree::
+CheckRedefinedInheritedAttr(Node* node) {
+  if (node == nullptr) {
+    return;
+  }
+  if (!ancestor_tab_.count(node->name)) {
+    CoolDumpError(cerr)
+      << "ancestor_tab_ cannot find " << node->name << endl;
+    exit(1);
+  }
+  // get current class's ancestors
+  const auto& ancestors = ancestor_tab_[node->name];
+  const auto& attr_type_tab = node->attr_type_tab;
+  StrSet redefined_attrs;
+  auto semant_error = SemantError::GetInstance(cerr);
+  // for each attr defined in current class
+  for (const auto& it : attr_type_tab) {
+    const auto& attr_name = it.first;
+    // check current class's super classes
+    for (const auto& ancestor_name : ancestors) {
+      if (!nodes_tab_.count(ancestor_name)) {
+        CoolDumpError(cerr) << "nodes_tab_ cannot find "
+                            << ancestor_name << endl;
+        exit(1);
+      }
+      Node* an = nodes_tab_[ancestor_name];
+
+      if (!an->attr_type_tab.count(attr_name)) {
+        continue;
+      }
+
+      redefined_attrs.insert(attr_name);
+      semant_error->Dump(node->ast_node_->filename, node->ast_node_)
+        << "Attribute " << attr_name
+        << " is an attribute of an inherited class."
+        << endl;
+      break;
+    }
+  }
+
+  // if current class has a redefined attribute, erase it
+  for (const auto& it : redefined_attrs) {
+    node->attr_type_tab.erase(it);
+  }
+
+  // recursively check
+  for (auto ch : node->children) {
+    CheckRedefinedInheritedAttr(ch);
+  }
+}
+
+void InheritanceTree::
+CheckRedefinedInheritedMethod(Node* node) {
+  if (node == nullptr) {
+    return;
+  }
+
+  if (!ancestor_tab_.count(node->name)) {
+    CoolDumpError(cerr)
+      << "ancestor_tab_ cannot find " << node->name << endl;
+    exit(1);
+  }
+
+  // get current class's ancestors
+  const auto& ancestors = ancestor_tab_[node->name];
+  const auto& method_type_tab = node->method_type_tab;
+  StrSet redefined_methods;
+  auto semant_error = SemantError::GetInstance(cerr);
+  // for each method in current class
+  for (const auto& it : method_type_tab) {
+    const auto& method_name = it.first;
+    // check it in the super class
+    for (const auto& ancestor_name : ancestors) {
+      if (!nodes_tab_.count(ancestor_name)) {
+        CoolDumpError(cerr) << "nodes_tab_ cannot find "
+                            << ancestor_name << endl;
+        exit(1);
+      }
+      Node* an = nodes_tab_[ancestor_name];
+
+      if (!an->method_type_tab.count(method_name)) {
+        continue;
+      }
+
+      // signature of method in current class
+      const auto& curr_sig = it.second;
+      // signature of method in super class
+      const auto& sup_sig = an->method_type_tab[method_name];
+
+      bool redefined_error = false;
+      
+      // first check return type
+      if (curr_sig.back() != sup_sig.back()) {
+        redefined_error = true;
+        semant_error->Dump(node->ast_node_->filename, node->ast_node_)
+          << "In redefined method " << it.first
+          << ", return type " << curr_sig.back()
+          << " is different from original return type "
+          << sup_sig.back() << endl;
+      } else if (curr_sig.size() != sup_sig.size()) {
+        redefined_error = true;
+        semant_error->Dump(node->ast_node_->filename, node->ast_node_)
+          << "Incompatible number of formal parameters in redefined method "
+          << it.first << endl;
+      } else {
+        for (int i = 0; i < curr_sig.size(); ++i) {
+          if (curr_sig[i] == sup_sig[i]) continue;
+          redefined_error = true;
+          semant_error->Dump(node->ast_node_->filename, node->ast_node_)
+            << "In redefined method " << it.first
+            << ", parameter type " << curr_sig[i]
+            << " is different from original type "
+            << sup_sig[i] << endl;
+          break;
+        }
+      }
+
+      if (redefined_error) {
+        redefined_methods.insert(it.first);
+      }
+    }
+  }
+
+  for (const auto& name : redefined_methods) {
+    node->method_type_tab.erase(name);
+  }
+
+  for (auto& ch : node->children) {
+    CheckRedefinedInheritedMethod(ch);
   }
 }

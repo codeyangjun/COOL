@@ -19,6 +19,8 @@ void DumpType(std::ostream& out, int n, const std::string& type);
 std::string ToEscapedString(const std::string& str);
 void Init(int* argc, char *argv[]);
 const char* PadSpace(int n);
+
+void DumpError(std::ostream& stream, const std::string& msg = "");
 } // namespace cool_helper
 
 class SemantError {
@@ -44,9 +46,15 @@ class SemantError {
     error_stream_ << filename->GetString() << ":" << c->GetLine() << ": ";
     return Dump();
   }
-void Abort() { error_stream_ << "Compilation halted due to static semantic errors."
+
+  void Abort() { 
+    error_stream_ << "Compilation halted due to static semantic errors."
                   << std::endl;
     exit(1);
+  }
+
+  int NumErrors() const {
+    return semant_errors_;
   }
 
  private:
@@ -70,9 +78,17 @@ typedef std::unordered_map<std::string, TypeSignature> MethodTypeSigTable; // a 
 typedef std::unordered_map<std::string, TypeSignature> AttrTypeSigTable; // a table maps attr name to attr_type
 typedef std::unordered_set<std::string> StrSet;
 
+// map class name to its ancestors
+typedef std::unordered_map<std::string, std::vector<std::string>> AncestorTable;
+
 // template
 template<typename B, typename S>
 bool IsSubClass(B* baseP) {
  return nullptr != dynamic_cast<S*>(baseP);
 }
+
+#define CoolDumpError(stream) \
+  stream << "Line:" << __LINE__ \
+         << ", function:" << __func__ \
+         << " : "
 #endif
