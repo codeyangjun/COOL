@@ -9,7 +9,6 @@ InheritanceTree::InheritanceTree(ProgramP ast_root)
   InitBasicClasses();
   CreateTree();
   CreateMethodAndAttrTypeInfoTab(root_);
-  DumpNodeTypeInfo(cerr);
   CreateAncestorTable(root_);
   CheckRedefinedInheritedAttr(root_);
   CheckRedefinedInheritedMethod(root_);
@@ -23,7 +22,6 @@ InheritanceTree::CreateTree() {
     nodes_tab_[class_name] = new Node(class_name, p);
     basic_classes_str_set_.insert(class_name);
     classes_str_set_.insert(class_name);
-    cout << class_name << endl;
   }
 
   // create link in basic classes node
@@ -130,8 +128,6 @@ InheritanceTree::CreateTree() {
     Node* curr_node = nodes_tab_[curr_name];
     curr_node->parent = parent_node;
     parent_node->children.push_back(curr_node);
-
-    cout << curr_name << "<-" << parent_name << endl;
   }
 
   LoopDetector loop_detector;  
@@ -553,4 +549,59 @@ CheckRedefinedInheritedMethod(Node* node) {
   for (auto& ch : node->children) {
     CheckRedefinedInheritedMethod(ch);
   }
+}
+
+void InheritanceTree::DumpAncestorTable(std::ostream& stream) {
+  stream << "--------- Ancestor List ---------" << endl;
+  for (const auto& it : ancestor_tab_) {
+    stream << "Class " << it.first << ": " << it.first;
+    for (const auto& name : it.second) {
+      stream << "->" << name;
+    }
+    stream << endl;
+  }
+  stream << endl;
+}
+
+const TypeSignature* InheritanceTree::
+LookupAttrTypeInfo(const std::string& class_name,
+                   const std::string& attr_name) {
+  if (!nodes_tab_.count(class_name)) {
+    return nullptr;
+  }
+
+  TypeSignature* ret = nullptr;
+
+  auto* anode = nodes_tab_[class_name];
+
+  if (anode->attr_type_tab.count(attr_name)) {
+    ret = &(anode->attr_type_tab[attr_name]);
+  }
+
+  // search upward inheritance tree
+  if (!ret) {
+    if (!ancestor_tab_.count(class_name)) {
+      return nullptr;
+    }
+    const auto& ancestors = ancestor_tab_[class_name];
+    for (const auto& name : ancestors) {
+      if (!nodes_tab_.count(name)) {
+        CoolDumpError(cerr)
+          << "nodes_tab_ cannot find ancestor " << name << endl;
+        exit(1);
+      }
+      auto* an = nodes_tab_[name];
+      if (!an->attr_type_tab.count(attr_name)) {
+        continue;
+      }
+      ret = &(an->attr_type_tab[attr_name]);
+    }
+  }
+  return ret;
+}
+
+const TypeSignature* InheritanceTree::
+LookupMethodInfo(const std::string& class_name,
+                 const std::string& method_name) {
+  ;
 }
