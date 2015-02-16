@@ -603,5 +603,15 @@ LookupAttrTypeInfo(const std::string& class_name,
 const TypeSignature* InheritanceTree::
 LookupMethodInfo(const std::string& class_name,
                  const std::string& method_name) {
-  ;
+  if (!nodes_tab_.count(class_name)) {
+    return nullptr;
+  }
+
+  TypeSignature* ret = nullptr;
+
+  auto* anode = nodes_tab_[class_name];
+
+  if (anode->method_type_tab.count(method_name)) {
+    ret = &(anode->method_type_tab[method_name]);
+  }
 }
