@@ -614,4 +614,57 @@ LookupMethodInfo(const std::string& class_name,
   if (anode->method_type_tab.count(method_name)) {
     ret = &(anode->method_type_tab[method_name]);
   }
+
+  if (!ret) {
+    if (!ancestor_tab_.count(class_name)) {
+      return nullptr;
+    }
+    const auto& ancestors = ancestor_tab_[class_name];
+    for (const auto& name : ancestors) {
+      if (!nodes_tab_.count(name)) {
+        CoolDumpError(cerr)
+          << "nodes_tab_ cannot find ancestor " << name << endl;
+        exit(1);
+      }
+      auto* an = nodes_tab_[name];
+      if (!an->method_type_tab.count(method_name)) {
+        continue;
+      }
+      ret = &(an->method_type_tab[method_name]);
+    }
+  }
+
+  return ret;
+}
+
+InheritanceTree::Node* InheritanceTree::
+LookupNode(const std::string& name) {
+  if (!nodes_tab_.count(name)) {
+    return nullptr;
+  } else {
+    return nodes_tab_[name];
+  }
+}
+
+bool InheritanceTree::
+IsConformed(const std::string& type1, const std::string& type2) {
+  if (type1 == type2) {
+    return true;
+  }
+
+  bool ret = false;
+  if (!ancestor_tab_.count(type1)) {
+    CoolDumpError(cerr)
+      << "ancestor_tab_ cannot find type " << type1 << endl;
+    exit(1);
+  }
+  const auto& ancestors = ancestor_tab_[type1];
+  for (const auto& name : ancestors) {
+    if (name != type2) {
+      continue;
+    }
+    ret = true;
+    break;
+  }
+  return ret;
 }

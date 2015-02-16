@@ -40,17 +40,19 @@ class InheritanceTree {
   InheritanceTree(ProgramP ast_root);
   ~InheritanceTree();
   Node* GetRoot() { return root_; }
+  Node* LookupNode(const std::string& name);
 
   const TypeSignature* LookupAttrTypeInfo(const std::string& class_name,
                                           const std::string& attr_name);
 
   const TypeSignature* LookupMethodInfo(const std::string& class_name,
                                         const std::string& method_name);
-
   void CheckRedefinedInheritedAttr(Node* node);
   void CheckRedefinedInheritedMethod(Node* node);
-
   void DumpAncestorTable(std::ostream& stream);
+
+  bool IsConformed(const std::string& type1, const std::string& type2);
+  std::string LCA(const std::string& type1, const std::string& type2);
 
  private:
   ClassesP CreateBasicClasses();
