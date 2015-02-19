@@ -2,6 +2,7 @@
 #define __SYMBOL_TAB__
 #include <string>
 #include <unordered_map>
+#include <vector>
 typedef class Symbol* SymbolP;
 class Symbol {
  private:
@@ -35,4 +36,26 @@ class SymbolTable {
 extern SymbolTable IdTable;
 extern SymbolTable IntTable;
 extern SymbolTable StrTable;
+
+class Scope {
+ private:
+  typedef std::unordered_map<std::string, std::string> Table;
+
+ public:
+  Scope() {}
+  ~Scope();
+
+  void EnterScope();
+  void ExitScope();
+  void AddMapping(const std::string& key, const std::string& value);
+
+  // lookup current scope
+  std::string* LookupCurrentScope(const std::string& key);
+  // lookup from current scope to topest scope, and return the first found
+  // mapping
+  std::string* Lookup(const std::string& key);
+
+ private:
+  std::vector<Table*> scope_;
+};
 #endif

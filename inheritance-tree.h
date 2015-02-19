@@ -54,13 +54,24 @@ class InheritanceTree {
   bool IsConformed(const std::string& type1, const std::string& type2);
   std::string LCA(const std::string& type1, const std::string& type2);
 
+  void DumpNodeTypeInfo(std::ostream& stream);
+
+  ClassesP GetUserClasses() {
+    return user_classes_;
+  }
+
+  ClassesP GetBasicClasses() {
+    return basic_classes_;
+  }
+
  private:
   ClassesP CreateBasicClasses();
   void InitBasicClasses();
   void CreateTree();
   void CreateMethodAndAttrTypeInfoTab(Node* node);
   void CreateAncestorTable(Node* node);
-  void DumpNodeTypeInfo(std::ostream& stream);
+  // node1 is a child of node2
+  bool IsChildOf(const Node* node1, const Node* node2);
 };
 
 class LoopDetector {

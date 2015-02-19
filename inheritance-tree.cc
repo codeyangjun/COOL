@@ -668,3 +668,43 @@ IsConformed(const std::string& type1, const std::string& type2) {
   }
   return ret;
 }
+
+bool InheritanceTree::
+IsChildOf(const Node* node1, const Node* node2) {
+  if (node1 == node2) {
+    return true;
+  }
+  bool ret = false;
+  for (const auto* ch : node2->children) {
+    ret |= IsChildOf(node1, ch);
+    if (ret) {
+      break;
+    }
+  }
+  return ret;
+}
+
+std::string
+InheritanceTree::LCA(const std::string& type1, const std::string& type2) {
+  if (!nodes_tab_.count(type1) || !nodes_tab_.count(type2)) {
+    CoolDumpError(cerr)
+      << "nodes_tab_ cannot find " << type1 << " or " << type2 << endl;
+    exit(1);
+  }
+
+  const auto* node1 = nodes_tab_[type1];
+  const auto* node2 = nodes_tab_[type2];
+
+  if (IsChildOf(node2, node1)) {
+    return type1;
+  }
+
+  while (node2 != nullptr) {
+    if (IsChildOf(node1, node2)) {
+      return node2->name;
+    }
+    node2 = node2->parent;
+  }
+
+  return "Object";
+}
