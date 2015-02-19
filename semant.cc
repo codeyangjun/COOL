@@ -112,6 +112,14 @@ void SemanticChecker::TypeChecking() {
 
 void SemanticChecker::
 TypeCheckingHelper(ExpressionP expr) {
-  ;
+  name_scope_->EnterScope();
+  if (IsSubClass<Expression, IntConstClass>(expr)) {
+    expr->SetType("Int");
+  } else if (IsSubClass<Expression, BoolConstClass>(expr)) {
+    expr->SetType("Bool");
+  } else if (IsSubClass<Expression, StringConstClass>(expr)) {
+    ;
+  }
+  name_scope_->ExitScope();
 }
 
