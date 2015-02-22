@@ -14,6 +14,8 @@ class SemanticChecker {
 
  private:
   void TypeCheckingHelper(ExpressionP expr);
+  void HandleObject(ExpressionP expr);
+  const std::string* IDTypeInfoLookup(const std::string& name);
 
  private:
   InheritanceTree* inherit_tree_;

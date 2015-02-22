@@ -62,7 +62,9 @@ class SemantError {
     : error_stream_(stream), semant_errors_(0) {}
 
   ~SemantError() { 
-    delete serror_;
+    if (serror_) {
+      delete serror_;
+    }
     serror_ = nullptr; 
   }
 
@@ -91,4 +93,5 @@ bool IsSubClass(B* baseP) {
   stream << "Line:" << __LINE__ \
          << ", function:" << __func__ \
          << " : "
+
 #endif

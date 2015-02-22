@@ -2,6 +2,7 @@
 #include "cool-tree.h"
 #include "helper.h"
 #include "inheritance-tree.h"
+#include "semant.h"
 using namespace std;
 int curr_lineno = 1;
 char* curr_filename;
@@ -28,5 +29,8 @@ int main(int argc, char** argv) {
   }
   
   auto tree = new InheritanceTree(ast_root);
+  auto semant = new SemanticChecker(tree);
+  semant->TypeChecking();
+  ast_root->DumpWithTypes(cout, 0);
   return 0;
 }

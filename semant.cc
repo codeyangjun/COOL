@@ -112,14 +112,47 @@ void SemanticChecker::TypeChecking() {
 
 void SemanticChecker::
 TypeCheckingHelper(ExpressionP expr) {
+  auto c_sym = ConstantSymbol::Get();
   name_scope_->EnterScope();
-  if (IsSubClass<Expression, IntConstClass>(expr)) {
-    expr->SetType("Int");
-  } else if (IsSubClass<Expression, BoolConstClass>(expr)) {
-    expr->SetType("Bool");
-  } else if (IsSubClass<Expression, StringConstClass>(expr)) {
+  if (IsSubClass<Expression, IntConst>(expr)) {
+    expr->SetType(c_sym->Int->GetString());
+  } else if (IsSubClass<Expression, BoolConst>(expr)) {
+    expr->SetType(c_sym->Bool->GetString());
+  } else if (IsSubClass<Expression, StringConst>(expr)) {
+    expr->SetType(c_sym->Str->GetString());
+  } else if (IsSubClass<Expression, Object>(expr)) {
+    HandleObject(expr);
+  } else if (IsSubClass<Expression, Assign>(expr)) {
     ;
   }
   name_scope_->ExitScope();
+}
+
+void SemanticChecker::
+HandleObject(ExpressionP expr) {
+  const auto* c_sym = ConstantSymbol::Get();
+  auto obj = static_cast<Object*>(expr);
+  const auto& id_name = obj->name->GetString();
+  const auto* ret = IDTypeInfoLookup(id_name);
+  if (ret) {
+    expr->SetType(*ret);
+  } else {
+    expr->SetType(c_sym->Object->GetString());
+    auto* se = SemantError::GetInstance(cerr);
+    se->Dump(curr_class_node_->ast_node_->filename, curr_class_node_->ast_node_)
+      << "Undeclared identifier " << id_name << endl;
+  }
+}
+
+const std::string*
+SemanticChecker::IDTypeInfoLookup(const std::string& name) {
+  const std::string* ret = nullptr;
+  if ((ret = name_scope_->Lookup(name))) {
+    return ret;
+  }
+  const auto* sig =
+    inherit_tree_->LookupAttrTypeInfo(curr_class_node_->name,
+                                     name);
+  return sig == nullptr ? nullptr : &(*sig)[0];
 }
 

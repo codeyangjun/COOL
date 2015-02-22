@@ -149,33 +149,34 @@ InheritanceTree::CreateTree() {
 
 void
 InheritanceTree::InitBasicClasses() {
-  auto arg = IdTable.AddString("arg");
-  auto arg2 = IdTable.AddString("arg2");
-  auto Bool = IdTable.AddString("Bool");
-  auto concat = IdTable.AddString("concat");
-  auto cool_abort = IdTable.AddString("abort");
-  auto copy = IdTable.AddString("copy");
-  auto Int = IdTable.AddString("Int");
-  auto in_int = IdTable.AddString("in_int");
-  auto in_string = IdTable.AddString("in_string"); auto IO = IdTable.AddString("IO");
-  auto length = IdTable.AddString("length");
-  auto Main = IdTable.AddString("Main");
-  auto main_meth = IdTable.AddString("main");
-  auto No_class = IdTable.AddString("_no_class");
-  auto No_type = IdTable.AddString("_no_type");
-  auto Object = IdTable.AddString("Object");
-  auto out_int = IdTable.AddString("out_int");
-  auto out_string = IdTable.AddString("out_string");
-  auto prim_slot = IdTable.AddString("_prim_slot");
-  auto self = IdTable.AddString("self");
-  auto SELF_TYPE = IdTable.AddString("SELF_TYPE");
-  auto Str = IdTable.AddString("String");
-  auto str_field = IdTable.AddString("_str_field");
-  auto substr = IdTable.AddString("substr");
-  auto type_name = IdTable.AddString("type_name");
-  auto val = IdTable.AddString("_val");
-
-  auto basic_fn = StrTable.AddString("<basic class>");
+  auto constants = ConstantSymbol::Get();
+  auto arg = constants->arg;
+  auto arg2 = constants->arg2;
+  auto Bool = constants->Bool;
+  auto concat = constants->concat;
+  auto cool_abort = constants->cool_abort;
+  auto copy = constants->copy;
+  auto Int = constants->Int;
+  auto in_int = constants->in_int;
+  auto in_string = constants->in_string;
+  auto IO = constants->IO;
+  auto length = constants->length;
+  auto Main = constants->Main;
+  auto main_meth = constants->main_meth;
+  auto No_class = constants->No_class;
+  auto No_type = constants->No_type;
+  auto Object = constants->Object;
+  auto out_int = constants->out_int;
+  auto out_string = constants->out_string;
+  auto prim_slot = constants->prim_slot;
+  auto self = constants->self;
+  auto SELF_TYPE = constants->SELF_TYPE;
+  auto Str = constants->Str;
+  auto str_field = constants->str_field;
+  auto substr = constants->substr;
+  auto type_name = constants->type_name;
+  auto val = constants->val;
+  auto basic_fn = constants->basic_fn;
 
   ClassP Object_class =
     CreateClass(Object,

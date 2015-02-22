@@ -37,6 +37,49 @@ extern SymbolTable IdTable;
 extern SymbolTable IntTable;
 extern SymbolTable StrTable;
 
+class ConstantSymbol {
+ public:
+  static const ConstantSymbol* Get() {
+    if (constants_ == nullptr) {
+      constants_ = new ConstantSymbol();
+    }
+    return constants_;
+  }
+
+  SymbolP arg;
+  SymbolP arg2;
+  SymbolP Bool;
+  SymbolP concat;
+  SymbolP cool_abort;
+  SymbolP copy;
+  SymbolP Int;
+  SymbolP in_int;
+  SymbolP in_string;
+  SymbolP IO;
+  SymbolP length;
+  SymbolP Main;
+  SymbolP main_meth;
+  SymbolP No_class;
+  SymbolP No_type;
+  SymbolP Object;
+  SymbolP out_int;
+  SymbolP out_string;
+  SymbolP prim_slot;
+  SymbolP self;
+  SymbolP SELF_TYPE;
+  SymbolP Str;
+  SymbolP str_field;
+  SymbolP substr;
+  SymbolP type_name;
+  SymbolP val;
+  SymbolP basic_fn;
+
+ private:
+  ConstantSymbol();
+  ~ConstantSymbol();
+  static ConstantSymbol* constants_;
+};
+
 class Scope {
  private:
   typedef std::unordered_map<std::string, std::string> Table;
