@@ -16,6 +16,6 @@ Output of test cases badexprlist.test, badfeatures.test, casenoexpr.test
 from my parser are somewhat diffrent from the reference one.
 ```
 
-#### Semantic Checker
+#### Semantic Checker (OK)
 
 #### Code Generator

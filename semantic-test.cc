@@ -25,12 +25,20 @@ int main(int argc, char** argv) {
 	    cerr << "Compilation halted due to lex and parse errors" << endl;
       exit(1);
     }
-    ast_root->DumpWithTypes(cout, 0);
+    // ast_root->DumpWithTypes(cout, 0);
   }
   
   auto tree = new InheritanceTree(ast_root);
+  if (SemantError::GetInstance(cerr)->NumErrors()) {
+	  cerr << "Compilation halted due to static semantic errors." << endl;
+    exit(1);
+  }
   auto semant = new SemanticChecker(tree);
   semant->TypeChecking();
+  if (SemantError::GetInstance(cerr)->NumErrors()) {
+	  cerr << "Compilation halted due to static semantic errors." << endl;
+    exit(1);
+  }
   ast_root->DumpWithTypes(cout, 0);
   return 0;
 }

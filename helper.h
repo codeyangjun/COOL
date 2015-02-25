@@ -6,6 +6,7 @@
 #include <map>
 #include <unordered_map>
 #include <unordered_set>
+#include <utility>
 #include <set>
 #include "cool-tree.h"
 #include "cool.tab.h"
@@ -25,6 +26,7 @@ void DumpError(std::ostream& stream, const std::string& msg = "");
 
 class SemantError {
  public:
+  // TODO: seperate this method into get and create method
   static SemantError* GetInstance(std::ostream& stream) { 
     if (serror_ == nullptr) {
       serror_ = new SemantError(stream);
@@ -76,6 +78,9 @@ class SemantError {
 
 // common use type defined
 typedef std::vector<std::string> TypeSignature; // contains a vector of type
+typedef std::vector<std::pair<std::string,std::string>> Signature; // a vector of <name:type>
+typedef std::unordered_map<std::string, Signature> MethodSigTab;   // method name -> <arg1_name,type1> <arg2_name,type2>
+typedef std::unordered_map<std::string, Signature> AttrSigTab;
 typedef std::unordered_map<std::string, TypeSignature> MethodTypeSigTable; // a table maps method name to (arg1_type, arg2_type, ..., return_type)
 typedef std::unordered_map<std::string, TypeSignature> AttrTypeSigTable; // a table maps attr name to attr_type
 typedef std::unordered_set<std::string> StrSet;
@@ -93,5 +98,8 @@ bool IsSubClass(B* baseP) {
   stream << "Line:" << __LINE__ \
          << ", function:" << __func__ \
          << " : "
+
+#define CoolDump(stream) \
+  stream << "#" << __LINE__ << ":"
 
 #endif

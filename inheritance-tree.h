@@ -8,7 +8,9 @@ class InheritanceTree {
    ClassP ast_node_; // pointes to the ast node of this class
    std::string name;
    MethodTypeSigTable method_type_tab;
+   MethodSigTab method_sig_tab;
    AttrTypeSigTable attr_type_tab;
+   AttrSigTab attr_sig_tab;
 
    Node* parent;
    std::vector<Node*> children;
@@ -37,6 +39,16 @@ class InheritanceTree {
   AncestorTable ancestor_tab_;
 
  public:
+  StrSet& GetBasicClassStrSet() {
+    return basic_classes_str_set_;
+  }
+
+  const StrSet& GetBasicClassStrSet() const {
+    return basic_classes_str_set_;
+  }
+
+
+ public:
   InheritanceTree(ProgramP ast_root);
   ~InheritanceTree();
   Node* GetRoot() { return root_; }
@@ -44,9 +56,10 @@ class InheritanceTree {
 
   const TypeSignature* LookupAttrTypeInfo(const std::string& class_name,
                                           const std::string& attr_name);
-
-  const TypeSignature* LookupMethodInfo(const std::string& class_name,
-                                        const std::string& method_name);
+  const TypeSignature* LookupMethodTypeInfo(const std::string& class_name,
+                                            const std::string& method_name);
+  const Signature* LookupMethodInfo(const std::string& class_name,
+                                    const std::string& method_name);
   void CheckRedefinedInheritedAttr(Node* node);
   void CheckRedefinedInheritedMethod(Node* node);
   void DumpAncestorTable(std::ostream& stream);

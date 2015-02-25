@@ -64,12 +64,13 @@ InheritanceTree::CreateTree() {
   for (auto p : *user_classes_) {
     const auto& class_name = p->name->GetString();
     if (nodes_tab_.count(class_name) || class_name == "SELF_TYPE") {
-      if (basic_classes_str_set_.count(class_name)) {
+      if (basic_classes_str_set_.count(class_name) ||
+          class_name == "SELF_TYPE") {
         semant_error->Dump(p->filename, p)
-          << "Redefinition of basic class " << class_name << endl;
+          << "Redefinition of basic class " << class_name << "." << endl;
       } else {
         semant_error->Dump(p->filename, p)
-          << "Class " << class_name << " is previously defined." << endl;
+          << "Class " << class_name << " was previously defined." << endl;
       }
       semant_error->Abort();
     }
@@ -93,12 +94,13 @@ InheritanceTree::CreateTree() {
     const auto& parent_name = p->parent->GetString();
 
     // inherits from basic classes except Object or IO
-    if (parent_name != "Object" &&
+    if ((parent_name != "Object" &&
         parent_name != "IO" &&
-        basic_classes_str_set_.count(parent_name)) {
+        basic_classes_str_set_.count(parent_name)) ||
+        parent_name == "SELF_TYPE") {
       semant_error->Dump(p->filename, p)
         << "Class " << curr_name
-        << " cannot inherits from class " << parent_name << endl;
+        << " cannot inherit class " << parent_name << "." << endl;
       semant_error->Abort();
     }
 
@@ -107,7 +109,8 @@ InheritanceTree::CreateTree() {
         !basic_classes_str_set_.count(parent_name)) {
       semant_error->Dump(p->filename, p)
         << "Class " << curr_name
-        << " inherits from undefined class " << parent_name << "." << endl;
+        << " inherits from an undefined class "
+        << parent_name << "." << endl;
       semant_error->Abort();
     }
    
@@ -319,21 +322,44 @@ InheritanceTree::CreateMethodAndAttrTypeInfoTab(Node* node) {
     if (IsSubClass<Feature, Method>(feature)) {
       auto method = (MethodP)feature;
       const auto& method_name = method->name->GetString();
+      Signature m_sig;
       TypeSignature sig;
       // add method args type
       for (auto formal : *(method->formals)) {
         if (formal->name->GetString() == "self") {
           semant_error->Dump(curr_class->filename, curr_class)
-            << "\'self\' cannot be the name of a formal paramter." << endl;
+            << "\'self\' cannot be the name of a formal parameter." << endl;
           continue;
         }
         if (formal->type_decl->GetString() == "SELF_TYPE") {
           semant_error->Dump(curr_class->filename, curr_class)
             << "Formal parameter " << formal->name->GetString()
-            << " cannot have type SELF_TYPE" << endl;
+            << " cannot have type SELF_TYPE." << endl;
         }
+        m_sig.push_back(make_pair(formal->name->GetString(),
+                                  formal->type_decl->GetString()));
         sig.push_back(formal->type_decl->GetString());
+
+        if (formal->type_decl->GetString() != "SELF_TYPE" &&
+            !basic_classes_str_set_.count(formal->type_decl->GetString()) &&
+            !user_classes_str_set_.count(formal->type_decl->GetString())) {
+            cerr << curr_class->filename->GetString()
+            << ":" << curr_class->GetLine() << ": "
+            << "Undefined parameter type " << formal->type_decl->GetString()
+            << " in method " << method_name << "."
+            << endl;
+        }
       }
+      if (method->return_type->GetString() != "SELF_TYPE" &&
+          !basic_classes_str_set_.count(method->return_type->GetString()) &&
+          !user_classes_str_set_.count(method->return_type->GetString())) {
+          cerr << curr_class->filename->GetString()
+          << ":" << curr_class->GetLine() << ": "
+          << "Undefined return type " << method->return_type->GetString()
+          << " in method " << method_name << "."
+          << endl;
+      }
+      m_sig.push_back(make_pair(method_name, method->return_type->GetString()));
       // add method return type info
       sig.push_back(method->return_type->GetString());
       if (node->method_type_tab.count(method_name)) {
@@ -342,13 +368,14 @@ InheritanceTree::CreateMethodAndAttrTypeInfoTab(Node* node) {
           // only store the first defined method
           continue;
       }
+      node->method_sig_tab[method_name].swap(m_sig);
       node->method_type_tab[method_name].swap(sig);
     } else if (IsSubClass<Feature, Attr>(feature)) {
       auto attr = (AttrP)feature;
       const auto& attr_name = attr->name->GetString();
       if (attr_name == "self") {
         semant_error->Dump(curr_class->filename, curr_class)
-            << "\'self\' cannot be the name of a attribute." << endl;
+            << "\'self\' cannot be the name of an attribute." << endl;
           continue;
       }
       if (node->attr_type_tab.count(attr_name)) {
@@ -357,8 +384,12 @@ InheritanceTree::CreateMethodAndAttrTypeInfoTab(Node* node) {
         // only store the first defined attribute
         continue;
       }
+      Signature a_sig;
       TypeSignature sig;
+      a_sig.push_back(make_pair(attr->name->GetString(),
+                                attr->type_decl->GetString()));
       sig.push_back(attr->type_decl->GetString());
+      node->attr_sig_tab[attr_name].swap(a_sig);
       node->attr_type_tab[attr_name].swap(sig);
     } else {
       cerr << "CreateMethodAndAttrTypeInfoTab: Unkonw Subclass." << endl;
@@ -523,7 +554,7 @@ CheckRedefinedInheritedMethod(Node* node) {
         redefined_error = true;
         semant_error->Dump(node->ast_node_->filename, node->ast_node_)
           << "Incompatible number of formal parameters in redefined method "
-          << it.first << endl;
+          << it.first << "." << endl;
       } else {
         for (int i = 0; i < curr_sig.size(); ++i) {
           if (curr_sig[i] == sup_sig[i]) continue;
@@ -601,9 +632,46 @@ LookupAttrTypeInfo(const std::string& class_name,
   return ret;
 }
 
-const TypeSignature* InheritanceTree::
+const Signature* InheritanceTree::
 LookupMethodInfo(const std::string& class_name,
                  const std::string& method_name) {
+  if (!nodes_tab_.count(class_name)) {
+    return nullptr;
+  }
+
+  Signature* ret = nullptr;
+
+  auto* anode = nodes_tab_[class_name];
+
+  if (anode->method_sig_tab.count(method_name)) {
+    ret = &(anode->method_sig_tab[method_name]);
+  }
+
+  if (!ret) {
+    if (!ancestor_tab_.count(class_name)) {
+      return nullptr;
+    }
+
+    const auto& ancestors = ancestor_tab_[class_name];
+    for (const auto& name : ancestors) {
+      if (!nodes_tab_.count(name)) {
+        CoolDumpError(cerr)
+          << "nodes_tab_ cannot find ancestor " << name << endl;
+        exit(1);
+      }
+      auto* an = nodes_tab_[name];
+      if (!an->method_sig_tab.count(method_name)) {
+        continue;
+      }
+      ret = &(an->method_sig_tab[method_name]);
+    }
+  }
+  return ret;
+}
+
+const TypeSignature* InheritanceTree::
+LookupMethodTypeInfo(const std::string& class_name,
+                     const std::string& method_name) {
   if (!nodes_tab_.count(class_name)) {
     return nullptr;
   }
