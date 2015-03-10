@@ -105,6 +105,8 @@ bool IsSubClass(B* baseP) {
          << " : "
 
 #define CoolDump(stream) \
-  stream << "#" << __LINE__ << ":"
+  stream << "#" << __LINE__ << ":"\
+         << ", function:" << __func__\
+         << " : "
 
 #endif
