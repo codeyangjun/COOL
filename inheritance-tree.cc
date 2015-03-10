@@ -29,6 +29,7 @@ InheritanceTree::CreateTree() {
     const auto& class_name = p->name->GetString();
     const auto& parent_name = p->parent->GetString();
     if (class_name == "Object") {
+      nodes_tab_[class_name]->parent = nullptr;
       continue;
     }
 

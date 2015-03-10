@@ -8,13 +8,19 @@ class Symbol {
  private:
   std::string str_;
   int index_;
-
+  std::string ref_;
  public:
-  Symbol(const std::string& str, int index) : str_(str), index_(index) {}
+  Symbol(const std::string& str, int index) : str_(str), index_(index) {
+    ref_ = "_" + str + "_symref";
+  }
   Symbol(const Symbol& rhs) = delete;
   Symbol& operator=(const Symbol& rhs) = delete;
   int GetIndex() const { return index_; }
+  int GetLen() const { return str_.size(); }
   const std::string& GetString() const { return str_; }
+  const std::string& GetRef() const {
+    return ref_;
+  }
   void Dump(std::ostream& stream, int n);
 };
 

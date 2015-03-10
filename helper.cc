@@ -1,9 +1,11 @@
 #include "helper.h"
+#include "symboltab.h"
 #include <iomanip>
 #include <iostream>
 #include <sstream>
 #include <cctype>
 #include <unistd.h>
+#include <algorithm>
 using namespace std;
 
 extern int yydebug;
@@ -199,6 +201,25 @@ void DumpLine(ostream& out, int n, int line) {
 
 void DumpType(ostream& stream, int n, const std::string& type) {
   stream << PadSpace(n) << ": " << (type == "" ? "_no_type" : type) << endl;
+}
+
+std::string GetClassLabelName(const std::string& class_name) {
+  return class_name + "_" + "protObj";
+}
+
+std::string GetClassDispatchTabName(const std::string& class_name) {
+  return class_name + "_" + "dispatch_tab";
+}
+
+std::string GetClassTagName(const std::string& class_name) {
+  std::string tag = "_" + class_name + "_" + "tag";
+  const auto* c_syms = ConstantSymbol::Get();
+  if (class_name == c_syms->Bool->GetString() ||
+      class_name == c_syms->Int->GetString() ||
+      class_name == c_syms->Str->GetString()) {
+    std::transform(tag.begin(), tag.end(), tag.begin(), ::tolower);
+  }
+  return tag;
 }
 
 } // namespace cool_helper

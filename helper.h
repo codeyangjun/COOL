@@ -20,8 +20,11 @@ void DumpType(std::ostream& out, int n, const std::string& type);
 std::string ToEscapedString(const std::string& str);
 void Init(int* argc, char *argv[]);
 const char* PadSpace(int n);
-
 void DumpError(std::ostream& stream, const std::string& msg = "");
+
+std::string GetClassLabelName(const std::string& class_name);
+std::string GetClassDispatchTabName(const std::string& class_name);
+std::string GetClassTagName(const std::string& class_name);
 } // namespace cool_helper
 
 class SemantError {
@@ -36,9 +39,7 @@ class SemantError {
 
   std::ostream& Dump() {
     semant_errors_++;
-    return error_stream_;
-  }
-
+    return error_stream_; } 
   std::ostream& Dump(ClassP c) {
     semant_errors_++;
     return Dump(c->filename, c);
@@ -77,6 +78,9 @@ class SemantError {
 };
 
 // common use type defined
+typedef std::unordered_map<std::string, int> StrToIntTab;
+typedef std::vector<std::string> VecStr;
+typedef std::unordered_map<std::string, VecStr> StrToVecStrTab;
 typedef std::vector<std::string> TypeSignature; // contains a vector of type
 typedef std::vector<std::pair<std::string,std::string>> Signature; // a vector of <name:type>
 typedef std::unordered_map<std::string, Signature> MethodSigTab;   // method name -> <arg1_name,type1> <arg2_name,type2>

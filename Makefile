@@ -55,5 +55,14 @@ semantic-test.o: semantic-test.cc inheritance-tree.h cool-tree.h helper.h
 cool-semant: semantic-test.o inheritance-tree.o cool.tab.o lex.yy.o symboltab.o cool-tree.o helper.o semant.o
 	$(CC) $(CFLAGS) $(FLEX_LIBS) $^ -o $@
 
+cgen.o: cgen.cc cgen.h cool-tree.h helper.h
+	$(CC) $(CFLAGS) $< -c -o $@
+
+codegen-test.o: codegen-test.cc
+	$(CC) $(CFLAGS) $< -c -o $@
+
+cool-codegen: codegen-test.o cgen.o semant.o inheritance-tree.o cool.tab.o lex.yy.o symboltab.o cool-tree.o helper.o
+	$(CC) $(CFLAGS) $(FLEX_LIBS) $^ -o $@
+
 clean:
 	rm *.o
