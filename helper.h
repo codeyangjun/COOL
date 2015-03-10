@@ -25,6 +25,7 @@ void DumpError(std::ostream& stream, const std::string& msg = "");
 std::string GetClassLabelName(const std::string& class_name);
 std::string GetClassDispatchTabName(const std::string& class_name);
 std::string GetClassTagName(const std::string& class_name);
+std::string GetClassInitMethod(const std::string& class_name);
 } // namespace cool_helper
 
 class SemantError {

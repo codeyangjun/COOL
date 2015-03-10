@@ -222,4 +222,8 @@ std::string GetClassTagName(const std::string& class_name) {
   return tag;
 }
 
+std::string GetClassInitMethod(const std::string& class_name) {
+  return class_name + "_init";
+}
+
 } // namespace cool_helper
