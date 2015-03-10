@@ -199,6 +199,7 @@ InheritanceTree::InitBasicClasses() {
                   )
                 );
 
+
   ClassP IO_class =
     CreateClass(IO,
                 Object,
@@ -271,6 +272,12 @@ InheritanceTree::InitBasicClasses() {
   basic_classes_ = AppendClass(basic_classes_, Int_class);
   basic_classes_ = AppendClass(basic_classes_, Bool_class);
   basic_classes_ = AppendClass(basic_classes_, Str_class);
+
+  StrTable.AddString(constants->Object->GetString());
+  StrTable.AddString(constants->IO->GetString());
+  StrTable.AddString(constants->Int->GetString());
+  StrTable.AddString(constants->Bool->GetString());
+  StrTable.AddString(constants->Str->GetString());
 }
 
 bool LoopDetector::
