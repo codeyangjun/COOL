@@ -87,6 +87,8 @@ void SemanticChecker::TypeChecking() {
         string ret_type = method->return_type->GetString();
         string expr_type = method->expression->GetType();
 
+        // cout << "return type:" << ret_type << endl;
+        // cout << "expr type:" << expr_type << endl; 
         bool res = false;
 
         if (ret_type == "SELF_TYPE" && expr_type != "SELF_TYPE") {
@@ -101,6 +103,7 @@ void SemanticChecker::TypeChecking() {
 
         if (!res) {
           semant_error->Dump(curr_class->filename, curr_class)
+            << "class:" << class_name << ","
             << "Inferred return type " << expr_type
             << " of method " << method->name->GetString()
             << " does not conform to declared return type "
@@ -438,6 +441,11 @@ HandleObject(ExpressionP expr) {
   const auto* c_sym = ConstantSymbol::Get();
   auto* obj = static_cast<Object*>(expr);
   const auto& id_name = obj->name->GetString();
+  cout << "id_name:" << id_name << endl;
+  if (id_name == "self") {
+    expr->SetType("SELF_TYPE");
+    return;
+  }
   const auto* ret = IDTypeInfoLookup(id_name);
   if (ret) {
     expr->SetType(*ret);
@@ -527,6 +535,11 @@ HandleCond(ExpressionP expr) {
   string then_type(cond_expr->then_exp->GetType());
   string else_type(cond_expr->else_exp->GetType());
 
+  if (then_type == "SELF_TYPE" && else_type == "SELF_TYPE") {
+    expr->SetType("SELF_TYPE");
+    return;
+  }
+
   then_type =
     then_type == "SELF_TYPE" ? curr_class_node_->name : then_type;
 
@@ -577,7 +590,11 @@ HandleCase(ExpressionP expr) {
       lca = sub_expr_type;
       first = false;
     } else {
-      lca = inherit_tree_->LCA(lca, sub_expr_type);
+      string temp_type1 =
+        lca == "SELF_TYPE" ? curr_class_node_->name : lca;
+      string temp_type2 =
+        sub_expr_type == "SELF_TYPE" ? curr_class_node_->name : sub_expr_type;
+      lca = inherit_tree_->LCA(temp_type1, temp_type2);
     }
   }
 

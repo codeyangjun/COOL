@@ -9,6 +9,16 @@ SymbolTable StrTable;
 
 ConstantSymbol* ConstantSymbol::constants_ = nullptr;
 
+static std::string SymbolRefGenerator() {
+  static int cnt = 0;
+  return to_string(cnt++);
+}
+
+Symbol::Symbol(const std::string& str, int index)
+  : str_(str), index_(index) {
+  ref_ = "_" + SymbolRefGenerator() + "_symref";
+}
+
 void Symbol::Dump(ostream& stream, int n) {
   stream << PadSpace(n) << str_ << endl;
 }
@@ -116,7 +126,7 @@ ConstantSymbol::ConstantSymbol() {
   substr = IdTable.AddString("substr");
   type_name = IdTable.AddString("type_name");
   val = IdTable.AddString("_val");
-  basic_fn = StrTable.AddString("<basic class>");
+  basic_fn = StrTable.AddString("basic_class");
 }
 
 ConstantSymbol::~ConstantSymbol() {

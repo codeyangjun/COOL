@@ -80,6 +80,7 @@ InheritanceTree::CreateTree() {
     IdTable.AddString(class_name);
     user_classes_str_set_.insert(class_name);
     classes_str_set_.insert(class_name);
+    StrTable.AddString(class_name);
   }
 
   // Check whether Main class is defined
