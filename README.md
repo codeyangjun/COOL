@@ -15,7 +15,7 @@ The compiler is developed on Mac OS X and compiled with clang.
 
 ## Setup 
 
-1. install spim 
+(1) install spim 
 
 ```bash
 brea install spim
@@ -24,7 +24,7 @@ brea install spim
 cp trap.handler /usr/local/Celler/spim/share/exception.s
 ```
 
-2. try
+(2) try
 
 The following 4 bins are independent. We can test different parts of
 the compiler.
@@ -43,7 +43,10 @@ make cool-semant
 make cool-codegen
 ```
 
-3. run generated code
+I also provide 4 scripts for testing the 4 parts with the giving exmaples in
+the compiler course. See `test-*.sh` and `*-test-files`
+
+(3) run generated code
 
 ```bash
 ./cool-codegen input-cool.file -o out.s
@@ -52,7 +55,7 @@ spim -file out.s
 
 ## Example of COOL
 
-1. Dynamic Dispatch
+(1) Dynamic Dispatch
 
 ```
 class Base inherits IO
@@ -86,7 +89,7 @@ class Main
 
 ```
 
-2. Factorial
+(2) Factorial
 
 ```
 class Main inherits IO {
