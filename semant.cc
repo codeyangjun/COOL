@@ -87,8 +87,6 @@ void SemanticChecker::TypeChecking() {
         string ret_type = method->return_type->GetString();
         string expr_type = method->expression->GetType();
 
-        // cout << "return type:" << ret_type << endl;
-        // cout << "expr type:" << expr_type << endl; 
         bool res = false;
 
         if (ret_type == "SELF_TYPE" && expr_type != "SELF_TYPE") {
@@ -103,7 +101,6 @@ void SemanticChecker::TypeChecking() {
 
         if (!res) {
           semant_error->Dump(curr_class->filename, curr_class)
-            << "class:" << class_name << ","
             << "Inferred return type " << expr_type
             << " of method " << method->name->GetString()
             << " does not conform to declared return type "
@@ -165,7 +162,8 @@ TypeCheckingHelper(ExpressionP expr) {
   } else if (IsSubClass<Expression, StaticDispatch>(expr)) {
     HandleStaticDispatch(expr);
   } else {
-    cout << "No match expression" << endl;
+    CoolDumpError(cerr)
+      << "No match expression" << endl;
     exit(-1);
   }
   name_scope_->ExitScope();
@@ -441,7 +439,6 @@ HandleObject(ExpressionP expr) {
   const auto* c_sym = ConstantSymbol::Get();
   auto* obj = static_cast<Object*>(expr);
   const auto& id_name = obj->name->GetString();
-  cout << "id_name:" << id_name << endl;
   if (id_name == "self") {
     expr->SetType("SELF_TYPE");
     return;

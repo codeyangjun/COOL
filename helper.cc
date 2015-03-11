@@ -15,17 +15,19 @@ SemantError* SemantError::serror_ = nullptr;
 
 namespace cool_helper {
 int g_log_cerr = 0;
+string g_codegen_out_fn = "";
 
 void Init(int* argc, char *argv[]) {
   const std::string help_msg = R"(
   usage:
-    [-hlpg] input-files
+    [-hlpg] input-files [-o outputfile]
 
   options:
     -h    print this messages
     -l    set yy_flex_debug = 1, prints recognized rules
     -p    set yydebug = 1, prints parser state
     -g    set g_log_cerr = 1
+    -o    specify code-gen output file
 )";
 
   auto print_help_msg = [&]() {
@@ -64,7 +66,17 @@ void Init(int* argc, char *argv[]) {
 
   int idx = 1;
   for (int i = 1; i < *argc; ++i) {
-    if (argv[i][0] == '-') continue;
+    if (argv[i][0] == '-') {
+      if (argv[i][1] == 'o') {
+        // no output file
+        if ((i + 1) >= *argc) {
+          print_help_msg();
+        } else {
+          g_codegen_out_fn = argv[++i];
+        }
+      }
+      continue;
+    }
     argv[idx++]  = argv[i];
   }
   

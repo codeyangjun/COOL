@@ -6,12 +6,11 @@ using namespace std;
 
 char* curr_filename = "<stdin>";
 FILE *fin;
-
 extern int yylex();
 extern FILE* yyin;
 extern int yylineno;
-
-YYSTYPE yylval;
+extern YYSTYPE yylval;
+int curr_lineno = 1;
 
 int main(int argc, char **argv) {
   cool_helper::Init(&argc, argv);

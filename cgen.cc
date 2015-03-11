@@ -176,7 +176,6 @@ CodeGen(ProgramP ast_root,
   : ast_root_(ast_root),
     inherit_tree_(inherit_tree),
     str_(os) {
-  cool_helper::g_log_cerr = 1;
   auto& log_flag = cool_helper::g_log_cerr;
   CollectClassInfo();
   if (log_flag) {
@@ -184,6 +183,13 @@ CodeGen(ProgramP ast_root,
       ele.second->Dump();
     }
   }
+
+}
+
+
+void CodeGen::
+Generate() {
+  auto& log_flag = cool_helper::g_log_cerr;
 
   IntTable.AddString("0");
   StrTable.AddString("");
@@ -271,6 +277,8 @@ CodeGen(ProgramP ast_root,
     cerr << " # class methods" << endl;
   }
   EmitClassMethods();
+
+  str_ << "main:" << endl;
 }
 
 CodeGen::~CodeGen() {
@@ -395,10 +403,6 @@ EmitClassTagDeclaration() {
     const std::string& tag_name = ele.second->tag_name;
     str_ << GLOBAL << tag_name << endl;
   }
-}
-
-void CodeGen::Generate() {
-  ;
 }
 
 void CodeGen::CollectClassInfo() {

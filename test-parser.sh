@@ -44,7 +44,7 @@ for infile in $infiles; do
   else
     echo "[${_red}FAILE${_reset}]\t$infile"
     echo "-----------------------------------------------------------------"
-    echo "left column is mylexer output, right column is correct output"
+    echo "left column is mylparser output, right column is correct output"
     echo "-----------------------------------------------------------------"
     cat diff.out
     echo "-----------------------------------------------------------------"

@@ -3,7 +3,6 @@ CC=clang++
 CFLAGS=-g -Wall -Wno-unused -std=c++11
 GTEST_LIBS=-lgtest -lpthread
 FLEX_LIBS=-ll
-ALL=symboltab-test cool-tree-test
 FFLAGS=
 BFLAGS=-d --verbose -t --debug -v -g
 
@@ -34,7 +33,7 @@ helper-test.o: helper-test.cc
 helper-test: helper-test.o helper.o
 	$(CC) $(CFLAGS) $(GTEST_LIBS) $^ -o $@
 
-cool-lexer: lex-test.o lex.yy.o symboltab.o cool-tree.o helper.o
+cool-lexer: lex-test.o lex.yy.o symboltab.o cool-tree.o helper.o cool.tab.o
 	$(CC) $(CFLAGS) $(FLEX_LIBS) $^ -o $@ 
 
 cool.tab.o: cool.tab.c cool.tab.h cool-tree.h symboltab.h
